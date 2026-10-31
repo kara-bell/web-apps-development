@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <div id="top"></div>
   <a class="skip-link" href="#main">Перейти к содержимому</a>
 
   <svg class="visually-hidden" aria-hidden="true" focusable="false">
@@ -56,7 +57,7 @@
   </svg>
 
   <!-- ============ Шапка ============ -->
-  <header class="site-header" id="top">
+  <header class="site-header">
     <div class="container header__inner">
       <a class="logo" href="#top" aria-label="QualityHub — в начало страницы">
         <svg class="logo__mark" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
@@ -362,6 +363,11 @@
             </button>
           </div>
           <p class="video-card__caption">Демонстрационный ролик. Видео загружается только после нажатия.</p>
+          <noscript>
+            <p class="video-card__caption">
+              <a href="assets/video/demo.mp4">Открыть видео-демо в отдельном окне</a>
+            </p>
+          </noscript>
         </div>
       </div>
     </section>
@@ -433,15 +439,15 @@
             <h3>Функциональность</h3>
             <p>Насколько полно система выполняет заявленные задачи.</p>
           </div>
-          <div class="tabs__panel" id="panel-reliability" role="tabpanel" aria-labelledby="tab-reliability" tabindex="0" hidden>
+          <div class="tabs__panel" id="panel-reliability" role="tabpanel" aria-labelledby="tab-reliability" tabindex="0">
             <h3>Надёжность</h3>
             <p>Стабильность работы и устойчивость к отказам.</p>
           </div>
-          <div class="tabs__panel" id="panel-usability" role="tabpanel" aria-labelledby="tab-usability" tabindex="0" hidden>
+          <div class="tabs__panel" id="panel-usability" role="tabpanel" aria-labelledby="tab-usability" tabindex="0">
             <h3>Удобство использования</h3>
             <p>Понятность интерфейса и скорость освоения.</p>
           </div>
-          <div class="tabs__panel" id="panel-maintainability" role="tabpanel" aria-labelledby="tab-maintainability" tabindex="0" hidden>
+          <div class="tabs__panel" id="panel-maintainability" role="tabpanel" aria-labelledby="tab-maintainability" tabindex="0">
             <h3>Сопровождаемость</h3>
             <p>Простота изменения и развития продукта.</p>
           </div>
@@ -487,7 +493,7 @@
           </ul>
         </div>
 
-        <form class="form" id="request-form" novalidate>
+        <form class="form" id="request-form">
           <div class="form__field">
             <label class="form__label" for="name">Имя</label>
             <input class="form__input" id="name" name="name" type="text" autocomplete="name" required>

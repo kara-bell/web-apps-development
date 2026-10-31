@@ -429,8 +429,14 @@ a:hover {
 
 .form__field--check {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: var(--space-2);
+}
+
+.form__field--check .form__error {
+  flex-basis: 100%;
+  margin-left: calc(1.125rem + var(--space-2));
 }
 
 .form__label {
@@ -1362,6 +1368,8 @@ textarea.form__input {
 .footer__meta p { margin: 0; }
 
 /* Модальное окно */
+
+body.modal-open { overflow: hidden; }
 
 .modal {
   width: min(920px, 92vw);
