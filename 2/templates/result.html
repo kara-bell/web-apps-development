@@ -12,6 +12,7 @@
     Мы получили вашу заявку и свяжемся по адресу
     <a href="mailto:{{ application.email }}">{{ application.email }}</a>.
   </p>
+  <p class="result__meta">Заявка №{{ applications_count }} в текущей сессии.</p>
 
   <dl class="result__summary">
     <div>
@@ -37,7 +38,10 @@
   </dl>
 
   <div class="result__actions">
-    <a class="button" href="{{ url_for('index') }}">Отправить ещё одну заявку</a>
+    <form method="post" action="{{ url_for('reset') }}">
+      <button class="button" type="submit">Отправить ещё одну заявку</button>
+    </form>
+    <a class="result__link" href="{{ url_for('index') }}">Вернуться к заявке</a>
   </div>
 </section>
 {% endblock %}

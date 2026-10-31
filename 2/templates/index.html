@@ -11,6 +11,19 @@
     Оставьте контактные данные и приложите файл — мы свяжемся с вами
     и покажем возможности системы управления качеством ПО.
   </p>
+
+  {% if has_draft %}
+  <div class="session-note">
+    <p>
+      Показаны данные последней заявки из сессии.
+      Всего заявок за сессию: {{ applications_count }}.
+      Файл нужно приложить заново.
+    </p>
+    <form method="post" action="{{ url_for('reset') }}">
+      <button class="button button--secondary" type="submit">Очистить данные</button>
+    </form>
+  </div>
+  {% endif %}
 </section>
 
 <section class="request" aria-labelledby="request-title">
