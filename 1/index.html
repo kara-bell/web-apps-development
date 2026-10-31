@@ -355,7 +355,7 @@
 
         <div class="video-card">
           <div class="video-card__poster">
-            <img class="video-card__image" src="assets/img/video-poster.jpg" alt="" width="960" height="540">
+            <img class="video-card__image" src="assets/img/video-poster.jpg" alt="" width="960" height="540" loading="lazy" decoding="async">
             <button class="video-card__play" type="button" aria-label="Воспроизвести видео-демо">
               <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M8 5v14l11-7z" fill="currentColor"></path>
@@ -385,9 +385,10 @@
           </div>
           <div class="podcast__player">
             <p class="player__title">Эпизод 1 · Зачем управлять качеством</p>
-            <audio class="podcast__audio" controls preload="metadata" src="assets/audio/demo-podcast.wav">
+            <audio class="podcast__audio" controls preload="metadata">
+              <source src="assets/audio/demo-podcast.mp3" type="audio/mpeg">
               Ваш браузер не поддерживает аудио. Демо-запись доступна по ссылке
-              <a href="assets/audio/demo-podcast.wav">demo-podcast.wav</a>.
+              <a href="assets/audio/demo-podcast.mp3">demo-podcast.mp3</a>.
             </audio>
             <p class="player__note">Демо-запись · 00:24</p>
           </div>
@@ -551,7 +552,7 @@
       </button>
       <h2 class="modal__title" id="video-modal-title">Видео-демо QualityHub</h2>
       <div class="modal__video">
-        <video controls preload="none" poster="assets/img/video-poster.jpg" playsinline>
+        <video controls preload="none" poster="assets/img/video-poster.jpg" width="960" height="540" playsinline>
           <source src="assets/video/demo.mp4" type="video/mp4">
           Ваш браузер не поддерживает видео. Демо-ролик доступен по ссылке
           <a href="assets/video/demo.mp4">demo.mp4</a>.
