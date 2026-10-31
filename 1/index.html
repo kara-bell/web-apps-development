@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QualityHub — система управления качеством ПО</title>
+  <meta name="description" content="QualityHub — учебная система управления качеством ПО: тест-планы, тест-кейсы, метрики и отчёты в одном прозрачном интерфейсе.">
+  <meta name="theme-color" content="#2563EB">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти к содержимому</a>
+
+  <svg class="visually-hidden" aria-hidden="true" focusable="false">
+    <symbol id="i-clipboard" viewBox="0 0 24 24">
+      <path d="M9 5h6M9 5a2 2 0 0 0-2 2v1h10V7a2 2 0 0 0-2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"></path>
+      <path d="M7 8H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1"></path>
+      <path d="m9 14 2 2 4-4"></path>
+    </symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24">
+      <path d="M4 4v16h16"></path>
+      <rect x="7" y="12" width="3" height="5"></rect>
+      <rect x="12" y="9" width="3" height="8"></rect>
+      <rect x="17" y="6" width="3" height="11"></rect>
+    </symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24">
+      <path d="M12 3 5 6v5c0 4.5 3 7.5 7 10 4-2.5 7-5.5 7-10V6l-7-3Z"></path>
+      <path d="m9 12 2 2 4-4"></path>
+    </symbol>
+    <symbol id="i-file" viewBox="0 0 24 24">
+      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"></path>
+      <path d="M14 3v5h5M9 13h6M9 17h6"></path>
+    </symbol>
+    <symbol id="i-play" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="m10 8 6 4-6 4V8Z"></path>
+    </symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24">
+      <path d="M4 10v4h4l5 4V6L8 10H4Z"></path>
+      <path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"></path>
+    </symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24">
+      <path d="M4 12h16M14 6l6 6-6 6"></path>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="m8 12 3 3 5-6"></path>
+    </symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24">
+      <path d="M4 7h16M4 12h16M4 17h16"></path>
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24">
+      <path d="M6 6l12 12M18 6 6 18"></path>
+    </symbol>
+  </svg>
+
+  <!-- ============ Шапка ============ -->
+  <header class="site-header" id="top">
+    <div class="container header__inner">
+      <a class="logo" href="#top" aria-label="QualityHub — в начало страницы">
+        <svg class="logo__mark" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <rect width="32" height="32" rx="8" fill="#2563EB"></rect>
+          <path d="M9 21V11h3v10H9Zm5.5 0V7h3v14h-3ZM20 21v-6h3v6h-3Z" fill="#ffffff"></path>
+        </svg>
+        <span class="logo__text">QualityHub</span>
+      </a>
+
+      <nav class="nav" id="primary-nav" aria-label="Основная навигация">
+        <ul class="nav__list">
+          <li><a class="nav__link" href="#features">Возможности</a></li>
+          <li><a class="nav__link" href="#dashboard">Интерфейс</a></li>
+          <li><a class="nav__link" href="#demo">Демо</a></li>
+          <li><a class="nav__link" href="#standards">Стандарты</a></li>
+          <li><a class="nav__link" href="#faq">FAQ</a></li>
+        </ul>
+        <a class="btn btn--primary nav__cta" href="#request">Запросить демо</a>
+      </nav>
+
+      <button class="burger" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Открыть меню">
+        <span class="burger__line"></span>
+        <span class="burger__line"></span>
+        <span class="burger__line"></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ============ 1. Hero ============ -->
+    <section class="hero" id="hero" aria-labelledby="hero-title">
+      <div class="container hero__inner">
+        <div class="hero__content">
+          <h1 class="hero__title" id="hero-title">Управляйте качеством ПО на основе данных</h1>
+          <p class="hero__lead">
+            Тест-планы, тест-кейсы, метрики и отчёты — в одном прозрачном интерфейсе.
+          </p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="#request">Запросить демо</a>
+            <a class="btn btn--ghost" href="#demo">Смотреть демо</a>
+          </div>
+          <dl class="hero__stats">
+            <div class="hero__stat">
+              <dt>Покрытие тестами</dt>
+              <dd>98%</dd>
+            </div>
+            <div class="hero__stat">
+              <dt>Дефектов закрыто</dt>
+              <dd>120+</dd>
+            </div>
+            <div class="hero__stat">
+              <dt>Отчёт</dt>
+              <dd>2 мин</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="hero__visual" aria-hidden="true">
+          <div class="hero__panel">
+            <div class="hero__panel-bar">
+              <span class="hero__dot"></span>
+              <span class="hero__dot"></span>
+              <span class="hero__dot"></span>
+            </div>
+            <div class="hero__panel-body">
+              <div class="hero__panel-head">
+                <span>Качество релиза</span>
+                <span class="badge badge--success">98%</span>
+              </div>
+              <svg class="hero__chart" viewBox="0 0 360 150" role="presentation" focusable="false">
+                <defs>
+                  <linearGradient id="heroChartArea" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#2563eb" stop-opacity="0.18"></stop>
+                    <stop offset="1" stop-color="#2563eb" stop-opacity="0"></stop>
+                  </linearGradient>
+                </defs>
+                <g stroke="#e2e8f0" stroke-width="1">
+                  <line x1="0" y1="25" x2="360" y2="25"></line>
+                  <line x1="0" y1="65" x2="360" y2="65"></line>
+                  <line x1="0" y1="105" x2="360" y2="105"></line>
+                  <line x1="0" y1="145" x2="360" y2="145"></line>
+                </g>
+                <path d="M0 122 L48 108 L96 112 L144 84 L192 90 L240 62 L288 70 L336 40 L336 150 L0 150 Z" fill="url(#heroChartArea)"></path>
+                <polyline points="0,122 48,108 96,112 144,84 192,90 240,62 288,70 336,40" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                <g fill="#ffffff" stroke="#2563eb" stroke-width="2">
+                  <circle cx="144" cy="84" r="3.5"></circle>
+                  <circle cx="240" cy="62" r="3.5"></circle>
+                  <circle cx="336" cy="40" r="3.5"></circle>
+                </g>
+              </svg>
+              <div class="hero__panel-rows">
+                <div class="hero__panel-row">
+                  <span>Тесты</span>
+                  <span class="hero__bar"><span style="width: 92%"></span></span>
+                  <span>92%</span>
+                </div>
+                <div class="hero__panel-row">
+                  <span>Покрытие</span>
+                  <span class="hero__bar"><span style="width: 78%"></span></span>
+                  <span>78%</span>
+                </div>
+                <div class="hero__panel-row">
+                  <span>Отчёты</span>
+                  <span class="hero__bar"><span style="width: 64%"></span></span>
+                  <span>64%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="hero__float hero__float--top">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-check"></use></svg>
+            +12% к покрытию
+          </span>
+          <span class="hero__float hero__float--bottom">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-shield"></use></svg>
+            17 дефектов
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 2. Проблема → решение ============ -->
+    <section class="section" id="problem" aria-labelledby="problem-title">
+      <div class="container">
+        <h2 class="section__title" id="problem-title">Проблема → решение</h2>
+        <div class="problem__grid">
+          <div class="problem__col problem__col--pain">
+            <h3 class="problem__heading">
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-close"></use></svg>
+              Как обычно
+            </h3>
+            <ul class="problem__list">
+              <li>Результаты тестов разбросаны по таблицам и чатам</li>
+              <li>Метрики считаются вручную</li>
+              <li>Качество обсуждают только перед релизом</li>
+            </ul>
+          </div>
+          <div class="problem__col problem__col--solution">
+            <h3 class="problem__heading">
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-check"></use></svg>
+              С QualityHub
+            </h3>
+            <ul class="problem__list">
+              <li>Тест-планы и кейсы в одном месте</li>
+              <li>Метрики обновляются автоматически</li>
+              <li>Качество видно на каждом этапе</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 3. Возможности ============ -->
+    <section class="section section--muted" id="features" aria-labelledby="features-title">
+      <div class="container">
+        <h2 class="section__title" id="features-title">Возможности</h2>
+        <p class="section__lead">Два ключевых модуля закрывают основной цикл работы с качеством.</p>
+        <div class="features__grid">
+          <article class="card">
+            <div class="card__icon">
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-clipboard"></use></svg>
+            </div>
+            <h3 class="card__title">Тестирование</h3>
+            <p class="card__text">Планирование проверок и прозрачный прогресс.</p>
+            <ul class="card__list">
+              <li>Тест-планы</li>
+              <li>Тест-кейсы</li>
+              <li>Прогоны тестов</li>
+            </ul>
+          </article>
+          <article class="card">
+            <div class="card__icon">
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-chart"></use></svg>
+            </div>
+            <h3 class="card__title">Метрики и отчёты</h3>
+            <p class="card__text">Показатели качества и готовые отчёты для команды.</p>
+            <ul class="card__list">
+              <li>Дашборд метрик</li>
+              <li>Отчёты по релизу</li>
+              <li>Экспорт данных</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 4. Макет панели ============ -->
+    <section class="section" id="dashboard" aria-labelledby="dashboard-title">
+      <div class="container">
+        <h2 class="section__title" id="dashboard-title">Интерфейс системы</h2>
+        <p class="section__lead">Все ключевые метрики качества — от покрытия тестами до открытых дефектов — в одном рабочем окне.</p>
+
+        <div class="dashboard" role="img" aria-label="Панель QualityHub: метрики, график и таблица дефектов">
+          <div class="dashboard__top">
+            <span class="dashboard__brand">QualityHub</span>
+            <span class="dashboard__crumb">Проект «Онлайн-сервис»</span>
+          </div>
+
+          <div class="dashboard__kpis">
+            <div class="kpi">
+              <span class="kpi__label">Покрытие тестами</span>
+              <span class="kpi__value">98%</span>
+              <span class="kpi__delta kpi__delta--up">+4%</span>
+            </div>
+            <div class="kpi">
+              <span class="kpi__label">Пройдено тестов</span>
+              <span class="kpi__value">1 248</span>
+              <span class="kpi__delta kpi__delta--up">+86</span>
+            </div>
+            <div class="kpi">
+              <span class="kpi__label">Открытые дефекты</span>
+              <span class="kpi__value">17</span>
+              <span class="kpi__delta kpi__delta--down">−9</span>
+            </div>
+            <div class="kpi">
+              <span class="kpi__label">Время до релиза</span>
+              <span class="kpi__value">2 дня</span>
+              <span class="kpi__delta">по плану</span>
+            </div>
+          </div>
+
+          <div class="dashboard__body">
+            <div class="chart" aria-hidden="true">
+              <div class="chart__head">
+                <p class="chart__title">Динамика дефектов</p>
+                <span class="chart__legend">закрыто за спринт</span>
+              </div>
+              <svg viewBox="0 0 640 240" role="presentation" focusable="false">
+                <defs>
+                  <linearGradient id="dashboardChartArea" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#2563eb" stop-opacity="0.14"></stop>
+                    <stop offset="1" stop-color="#2563eb" stop-opacity="0"></stop>
+                  </linearGradient>
+                </defs>
+                <g stroke="#e2e8f0" stroke-width="1">
+                  <line x1="0" y1="30" x2="640" y2="30"></line>
+                  <line x1="0" y1="80" x2="640" y2="80"></line>
+                  <line x1="0" y1="130" x2="640" y2="130"></line>
+                  <line x1="0" y1="180" x2="640" y2="180"></line>
+                  <line x1="0" y1="230" x2="640" y2="230"></line>
+                </g>
+                <path d="M0 200 L78 180 L156 190 L234 150 L312 160 L390 120 L468 132 L546 90 L620 100 L620 240 L0 240 Z" fill="url(#dashboardChartArea)"></path>
+                <polyline points="0,200 78,180 156,190 234,150 312,160 390,120 468,132 546,90 620,100" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                <g fill="#ffffff" stroke="#2563eb" stroke-width="2.5">
+                  <circle cx="234" cy="150" r="4"></circle>
+                  <circle cx="390" cy="120" r="4"></circle>
+                  <circle cx="546" cy="90" r="4"></circle>
+                </g>
+              </svg>
+            </div>
+
+            <div class="table-wrap">
+              <table class="table">
+                <caption>Открытые дефекты</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Дефект</th>
+                    <th scope="col">Приоритет</th>
+                    <th scope="col">Статус</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>QH-142</td>
+                    <td>Ошибка фильтра отчётов</td>
+                    <td><span class="badge badge--warning">Высокий</span></td>
+                    <td>В работе</td>
+                  </tr>
+                  <tr>
+                    <td>QH-138</td>
+                    <td>Неверный расчёт покрытия</td>
+                    <td><span class="badge badge--warning">Высокий</span></td>
+                    <td>В работе</td>
+                  </tr>
+                  <tr>
+                    <td>QH-131</td>
+                    <td>Опечатка в экспорте CSV</td>
+                    <td><span class="badge">Низкий</span></td>
+                    <td>Открыт</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 5. Видео-демо ============ -->
+    <section class="section section--muted" id="demo" aria-labelledby="demo-title">
+      <div class="container">
+        <h2 class="section__title" id="demo-title">Видео-демо</h2>
+        <p class="section__lead">Короткий обзор продукта — 15 секунд.</p>
+
+        <div class="video-card">
+          <div class="video-card__poster">
+            <img class="video-card__image" src="assets/img/video-poster.jpg" alt="" width="960" height="540">
+            <button class="video-card__play" type="button" aria-label="Воспроизвести видео-демо">
+              <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M8 5v14l11-7z" fill="currentColor"></path>
+              </svg>
+            </button>
+          </div>
+          <p class="video-card__caption">Демонстрационный ролик. Видео загружается только после нажатия.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 6. Подкаст ============ -->
+    <section class="section" id="podcast" aria-labelledby="podcast-title">
+      <div class="container">
+        <div class="podcast">
+          <div class="podcast__info">
+            <h2 class="section__title" id="podcast-title">Подкаст о качестве</h2>
+            <p class="section__lead">
+              Почему качество ПО — это процесс, а не финальная проверка.
+            </p>
+            <p class="podcast__meta">Эпизод 1 · 00:24 · демо-запись</p>
+          </div>
+          <div class="podcast__player">
+            <p class="player__title">Эпизод 1 · Зачем управлять качеством</p>
+            <audio class="podcast__audio" controls preload="metadata" src="assets/audio/demo-podcast.wav">
+              Ваш браузер не поддерживает аудио. Демо-запись доступна по ссылке
+              <a href="assets/audio/demo-podcast.wav">demo-podcast.wav</a>.
+            </audio>
+            <p class="player__note">Демо-запись · 00:24</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 7. Инфографика ============ -->
+    <section class="section section--muted" id="numbers" aria-labelledby="numbers-title">
+      <div class="container">
+        <h2 class="section__title" id="numbers-title">Качество в цифрах</h2>
+        <p class="section__lead">Демонстрационные показатели учебного проекта.</p>
+        <div class="numbers__grid">
+          <div class="number-card">
+            <span class="number-card__value">98%</span>
+            <span class="number-card__label">покрытие тестами</span>
+          </div>
+          <div class="number-card">
+            <span class="number-card__value">1 248</span>
+            <span class="number-card__label">тестов в прогоне</span>
+          </div>
+          <div class="number-card">
+            <span class="number-card__value">−35%</span>
+            <span class="number-card__label">дефектов после релиза</span>
+          </div>
+          <div class="number-card">
+            <span class="number-card__value">2 мин</span>
+            <span class="number-card__label">на подготовку отчёта</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 8. Стандарты ============ -->
+    <section class="section" id="standards" aria-labelledby="standards-title">
+      <div class="container">
+        <h2 class="section__title" id="standards-title">Опора на стандарты</h2>
+        <p class="section__lead">Характеристики качества по ISO/IEC 25010, на которые ориентируется продукт.</p>
+
+        <div class="tabs">
+          <div class="tabs__list" role="tablist" aria-label="Характеристики качества ISO/IEC 25010">
+            <button class="tabs__tab" id="tab-functional" type="button" role="tab" aria-selected="true" aria-controls="panel-functional">Функциональность</button>
+            <button class="tabs__tab" id="tab-reliability" type="button" role="tab" aria-selected="false" aria-controls="panel-reliability" tabindex="-1">Надёжность</button>
+            <button class="tabs__tab" id="tab-usability" type="button" role="tab" aria-selected="false" aria-controls="panel-usability" tabindex="-1">Удобство</button>
+            <button class="tabs__tab" id="tab-maintainability" type="button" role="tab" aria-selected="false" aria-controls="panel-maintainability" tabindex="-1">Сопровождаемость</button>
+          </div>
+
+          <div class="tabs__panel" id="panel-functional" role="tabpanel" aria-labelledby="tab-functional" tabindex="0">
+            <h3>Функциональность</h3>
+            <p>Насколько полно система выполняет заявленные задачи.</p>
+          </div>
+          <div class="tabs__panel" id="panel-reliability" role="tabpanel" aria-labelledby="tab-reliability" tabindex="0" hidden>
+            <h3>Надёжность</h3>
+            <p>Стабильность работы и устойчивость к отказам.</p>
+          </div>
+          <div class="tabs__panel" id="panel-usability" role="tabpanel" aria-labelledby="tab-usability" tabindex="0" hidden>
+            <h3>Удобство использования</h3>
+            <p>Понятность интерфейса и скорость освоения.</p>
+          </div>
+          <div class="tabs__panel" id="panel-maintainability" role="tabpanel" aria-labelledby="tab-maintainability" tabindex="0" hidden>
+            <h3>Сопровождаемость</h3>
+            <p>Простота изменения и развития продукта.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 9. FAQ ============ -->
+    <section class="section section--muted" id="faq" aria-labelledby="faq-title">
+      <div class="container">
+        <h2 class="section__title" id="faq-title">Частые вопросы</h2>
+        <div class="faq">
+          <details class="faq__item">
+            <summary class="faq__question">Это рабочий продукт или учебный проект?</summary>
+            <p class="faq__answer">Учебный проект: интерфейс демонстрирует концепцию системы управления качеством.</p>
+          </details>
+          <details class="faq__item">
+            <summary class="faq__question">Какие модули уже есть?</summary>
+            <p class="faq__answer">Тестирование и модуль метрик и отчётов.</p>
+          </details>
+          <details class="faq__item">
+            <summary class="faq__question">Нужно ли что-то устанавливать?</summary>
+            <p class="faq__answer">Нет, достаточно открыть страницу в браузере.</p>
+          </details>
+          <details class="faq__item">
+            <summary class="faq__question">Как записаться на демонстрацию?</summary>
+            <p class="faq__answer">Оставьте заявку в форме ниже — это демонстрационный сценарий без отправки данных.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 10. Форма заявки ============ -->
+    <section class="section" id="request" aria-labelledby="request-title">
+      <div class="container request__grid">
+        <div class="request__info">
+          <h2 class="section__title" id="request-title">Запросить демонстрацию</h2>
+          <p class="section__lead">Покажем, как QualityHub помогает видеть качество на каждом этапе.</p>
+          <ul class="request__benefits">
+            <li>Обзор модулей тестирования и отчётности</li>
+            <li>Разбор демо-макета панели</li>
+            <li>Ответы на вопросы</li>
+          </ul>
+        </div>
+
+        <form class="form" id="request-form" novalidate>
+          <div class="form__field">
+            <label class="form__label" for="name">Имя</label>
+            <input class="form__input" id="name" name="name" type="text" autocomplete="name" required>
+          </div>
+          <div class="form__field">
+            <label class="form__label" for="email">E-mail</label>
+            <input class="form__input" id="email" name="email" type="email" autocomplete="email" required>
+          </div>
+          <div class="form__field">
+            <label class="form__label" for="company">Компания <span class="form__optional">(необязательно)</span></label>
+            <input class="form__input" id="company" name="company" type="text" autocomplete="organization">
+          </div>
+          <div class="form__field">
+            <label class="form__label" for="message">Комментарий</label>
+            <textarea class="form__input" id="message" name="message" rows="3"></textarea>
+          </div>
+          <div class="form__field form__field--check">
+            <input class="form__check" id="consent" name="consent" type="checkbox" required>
+            <label class="form__label" for="consent">Согласен на обработку данных</label>
+          </div>
+          <button class="btn btn--primary form__submit" type="submit">Отправить заявку</button>
+          <p class="form__status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ Footer ============ -->
+  <footer class="site-footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <span class="logo__text">QualityHub</span>
+        <p class="footer__note">Учебный проект по курсу «Разработка веб-приложения».</p>
+      </div>
+      <nav class="footer__nav" aria-label="Навигация в подвале">
+        <a href="#features">Возможности</a>
+        <a href="#dashboard">Интерфейс</a>
+        <a href="#standards">Стандарты</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="footer__meta">
+        <a href="mailto:hello@qualityhub.example">hello@qualityhub.example</a>
+        <p>© 2026 QualityHub</p>
+        <a href="docs/README.md">Документация</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ Модальное окно видео ============ -->
+  <dialog class="modal" id="video-modal" aria-labelledby="video-modal-title">
+    <div class="modal__inner">
+      <button class="modal__close" type="button" aria-label="Закрыть видео">
+        <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-close"></use></svg>
+      </button>
+      <h2 class="modal__title" id="video-modal-title">Видео-демо QualityHub</h2>
+      <div class="modal__video">
+        <video controls preload="none" poster="assets/img/video-poster.jpg" playsinline>
+          <source src="assets/video/demo.mp4" type="video/mp4">
+          Ваш браузер не поддерживает видео. Демо-ролик доступен по ссылке
+          <a href="assets/video/demo.mp4">demo.mp4</a>.
+        </video>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="js/main.js" defer></script>
+</body>
+</html>
