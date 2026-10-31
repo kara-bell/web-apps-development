@@ -231,6 +231,10 @@ a:hover {
   top: var(--space-4);
 }
 
+#main:focus {
+  outline: none;
+}
+
 .icon {
   width: 24px;
   height: 24px;
@@ -436,7 +440,7 @@ a:hover {
 
 .form__field--check .form__error {
   flex-basis: 100%;
-  margin-left: calc(1.125rem + var(--space-2));
+  margin-left: calc(1.5rem + var(--space-2));
 }
 
 .form__label {
@@ -498,9 +502,9 @@ textarea.form__input {
 }
 
 .form__check {
-  width: 1.125rem;
-  height: 1.125rem;
-  margin-top: 0.2rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0.125rem;
   accent-color: var(--color-primary-600);
   flex: none;
 }
@@ -1361,11 +1365,21 @@ textarea.form__input {
 }
 
 .footer__nav a,
-.footer__meta a { color: #cbd5e1; text-decoration: none; }
+.footer__meta a {
+  display: inline-block;
+  padding-block: 0.125rem;
+  color: #cbd5e1;
+  text-decoration: none;
+}
 .footer__nav a:hover,
 .footer__meta a:hover { color: #ffffff; text-decoration: underline; }
 .footer__meta { color: #94a3b8; }
 .footer__meta p { margin: 0; }
+
+.site-footer :focus-visible,
+.video-card__poster :focus-visible {
+  outline-color: #ffffff;
+}
 
 /* Модальное окно */
 
