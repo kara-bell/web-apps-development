@@ -2,6 +2,8 @@
 
 {% block title %}Заявка на демо — QualityHub{% endblock %}
 
+{% block main_class %} page-form{% endblock %}
+
 {% block content %}
 <section class="intro" aria-labelledby="intro-title">
   <h1 id="intro-title">Заявка на демо</h1>
@@ -15,11 +17,18 @@
   <h2 id="request-title">Данные для связи</h2>
   <p class="request__lead">Поля, отмеченные звёздочкой, обязательны.</p>
 
+  {% if errors %}
+  <div class="form-alert" role="alert">
+    <strong>Проверьте форму.</strong> Некоторые поля заполнены неверно.
+  </div>
+  {% endif %}
+
   <form
     class="request-form"
     action="{{ url_for('submit') }}"
     method="post"
     enctype="multipart/form-data"
+    novalidate
   >
     <div class="form-field">
       <label for="name">Имя и фамилия <span aria-hidden="true">*</span></label>
@@ -32,7 +41,12 @@
         minlength="2"
         maxlength="80"
         placeholder="Анна Иванова"
+        value="{{ form.get('name', '') }}"
+        {% if errors.get('name') %}aria-invalid="true" aria-describedby="name-error"{% endif %}
       >
+      {% if errors.get('name') %}
+      <p class="form-field__error" id="name-error">{{ errors.name }}</p>
+      {% endif %}
     </div>
 
     <div class="form-field">
@@ -45,7 +59,12 @@
         required
         maxlength="120"
         placeholder="anna@example.com"
+        value="{{ form.get('email', '') }}"
+        {% if errors.get('email') %}aria-invalid="true" aria-describedby="email-error"{% endif %}
       >
+      {% if errors.get('email') %}
+      <p class="form-field__error" id="email-error">{{ errors.email }}</p>
+      {% endif %}
     </div>
 
     <div class="form-field">
@@ -57,18 +76,30 @@
         autocomplete="organization"
         maxlength="120"
         placeholder="ООО «Пример»"
+        value="{{ form.get('company', '') }}"
+        {% if errors.get('company') %}aria-invalid="true" aria-describedby="company-error"{% endif %}
       >
+      {% if errors.get('company') %}
+      <p class="form-field__error" id="company-error">{{ errors.company }}</p>
+      {% endif %}
     </div>
 
     <div class="form-field">
       <label for="topic">Тема обращения <span aria-hidden="true">*</span></label>
-      <select id="topic" name="topic" required>
-        <option value="">Выберите тему</option>
-        <option value="demo">Демонстрация возможностей</option>
-        <option value="implementation">Внедрение</option>
-        <option value="support">Техническая поддержка</option>
-        <option value="other">Другое</option>
+      <select
+        id="topic"
+        name="topic"
+        required
+        {% if errors.get('topic') %}aria-invalid="true" aria-describedby="topic-error"{% endif %}
+      >
+        <option value="" {% if not form.get('topic') %}selected{% endif %}>Выберите тему</option>
+        {% for value, label in topics.items() %}
+        <option value="{{ value }}" {% if form.get('topic') == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
       </select>
+      {% if errors.get('topic') %}
+      <p class="form-field__error" id="topic-error">{{ errors.topic }}</p>
+      {% endif %}
     </div>
 
     <div class="form-field form-field--full">
@@ -80,10 +111,13 @@
         required
         minlength="10"
         maxlength="2000"
-        aria-describedby="message-hint"
+        aria-describedby="message-hint{% if errors.get('message') %} message-error{% endif %}"
         placeholder="Коротко опишите задачу или вопрос"
-      ></textarea>
+      >{{ form.get('message', '') }}</textarea>
       <p class="form-field__hint" id="message-hint">От 10 до 2000 символов.</p>
+      {% if errors.get('message') %}
+      <p class="form-field__error" id="message-error">{{ errors.message }}</p>
+      {% endif %}
     </div>
 
     <div class="form-field form-field--full">

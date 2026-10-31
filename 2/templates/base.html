@@ -18,7 +18,7 @@
     </div>
   </header>
 
-  <main id="main" class="container" tabindex="-1">
+  <main id="main" class="container{% block main_class %}{% endblock %}" tabindex="-1">
     {% block content %}{% endblock %}
   </main>
 

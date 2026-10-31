@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Заявка отправлена — QualityHub{% endblock %}
+
+{% block main_class %} page-result{% endblock %}
+
+{% block content %}
+<section class="request result" aria-labelledby="result-title">
+  <p class="result__badge">Заявка отправлена</p>
+  <h1 id="result-title">Спасибо, {{ application.name }}!</h1>
+  <p class="result__lead">
+    Мы получили вашу заявку и свяжемся по адресу
+    <a href="mailto:{{ application.email }}">{{ application.email }}</a>.
+  </p>
+
+  <dl class="result__summary">
+    <div>
+      <dt>Имя и фамилия</dt>
+      <dd>{{ application.name }}</dd>
+    </div>
+    <div>
+      <dt>E-mail</dt>
+      <dd>{{ application.email }}</dd>
+    </div>
+    <div>
+      <dt>Компания</dt>
+      <dd>{{ application.company or "—" }}</dd>
+    </div>
+    <div>
+      <dt>Тема обращения</dt>
+      <dd>{{ topic_label }}</dd>
+    </div>
+    <div>
+      <dt>Сообщение</dt>
+      <dd>{{ application.message }}</dd>
+    </div>
+  </dl>
+
+  <div class="result__actions">
+    <a class="button" href="{{ url_for('index') }}">Отправить ещё одну заявку</a>
+  </div>
+</section>
+{% endblock %}
