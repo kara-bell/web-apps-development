@@ -10,4 +10,100 @@
     и покажем возможности системы управления качеством ПО.
   </p>
 </section>
+
+<section class="request" aria-labelledby="request-title">
+  <h2 id="request-title">Данные для связи</h2>
+  <p class="request__lead">Поля, отмеченные звёздочкой, обязательны.</p>
+
+  <form
+    class="request-form"
+    action="{{ url_for('submit') }}"
+    method="post"
+    enctype="multipart/form-data"
+  >
+    <div class="form-field">
+      <label for="name">Имя и фамилия <span aria-hidden="true">*</span></label>
+      <input
+        id="name"
+        name="name"
+        type="text"
+        autocomplete="name"
+        required
+        minlength="2"
+        maxlength="80"
+        placeholder="Анна Иванова"
+      >
+    </div>
+
+    <div class="form-field">
+      <label for="email">E-mail <span aria-hidden="true">*</span></label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        autocomplete="email"
+        required
+        maxlength="120"
+        placeholder="anna@example.com"
+      >
+    </div>
+
+    <div class="form-field">
+      <label for="company">Компания</label>
+      <input
+        id="company"
+        name="company"
+        type="text"
+        autocomplete="organization"
+        maxlength="120"
+        placeholder="ООО «Пример»"
+      >
+    </div>
+
+    <div class="form-field">
+      <label for="topic">Тема обращения <span aria-hidden="true">*</span></label>
+      <select id="topic" name="topic" required>
+        <option value="">Выберите тему</option>
+        <option value="demo">Демонстрация возможностей</option>
+        <option value="implementation">Внедрение</option>
+        <option value="support">Техническая поддержка</option>
+        <option value="other">Другое</option>
+      </select>
+    </div>
+
+    <div class="form-field form-field--full">
+      <label for="message">Сообщение <span aria-hidden="true">*</span></label>
+      <textarea
+        id="message"
+        name="message"
+        rows="5"
+        required
+        minlength="10"
+        maxlength="2000"
+        aria-describedby="message-hint"
+        placeholder="Коротко опишите задачу или вопрос"
+      ></textarea>
+      <p class="form-field__hint" id="message-hint">От 10 до 2000 символов.</p>
+    </div>
+
+    <div class="form-field form-field--full">
+      <label for="attachment">Файл <span aria-hidden="true">*</span></label>
+      <input
+        id="attachment"
+        name="attachment"
+        type="file"
+        required
+        accept=".pdf,.png,.jpg,.jpeg,.txt"
+        aria-describedby="attachment-hint"
+      >
+      <p class="form-field__hint" id="attachment-hint">
+        PDF, PNG, JPG или TXT, не больше 5 МБ.
+      </p>
+    </div>
+
+    <div class="form-actions form-field--full">
+      <button class="button" type="submit">Отправить заявку</button>
+    </div>
+  </form>
+</section>
 {% endblock %}
