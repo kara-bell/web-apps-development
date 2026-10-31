@@ -32,8 +32,19 @@
       <dd>{{ topic_label }}</dd>
     </div>
     <div>
+      <dt>Файл</dt>
+      <dd>
+        {% if upload %}
+          <a class="result__file-link" href="{{ url_for('download_file', filename=upload.stored_name) }}">{{ upload.original_name }}</a>
+          <span class="result__file-size">({{ upload.size | filesize }})</span>
+        {% else %}
+          —
+        {% endif %}
+      </dd>
+    </div>
+    <div>
       <dt>Сообщение</dt>
-      <dd>{{ application.message }}</dd>
+      <dd class="result__message">{{ application.message }}</dd>
     </div>
   </dl>
 

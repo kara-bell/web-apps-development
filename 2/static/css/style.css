@@ -444,7 +444,20 @@ main:focus {
   margin: 0;
   color: var(--color-ink-900);
   overflow-wrap: anywhere;
+}
+
+.result__message {
   white-space: pre-line;
+}
+
+.result__file-link {
+  font-weight: 600;
+}
+
+.result__file-size {
+  margin-left: 4px;
+  font-size: 13px;
+  color: var(--color-ink-500);
 }
 
 .result__actions {

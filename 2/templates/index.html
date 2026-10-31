@@ -141,11 +141,15 @@
         type="file"
         required
         accept=".pdf,.png,.jpg,.jpeg,.txt"
-        aria-describedby="attachment-hint"
+        aria-describedby="attachment-hint{% if errors.get('attachment') %} attachment-error{% endif %}"
+        {% if errors.get('attachment') %}aria-invalid="true"{% endif %}
       >
       <p class="form-field__hint" id="attachment-hint">
         PDF, PNG, JPG или TXT, не больше 5 МБ.
       </p>
+      {% if errors.get('attachment') %}
+      <p class="form-field__error" id="attachment-error">{{ errors.attachment }}</p>
+      {% endif %}
     </div>
 
     <div class="form-actions form-field--full">
