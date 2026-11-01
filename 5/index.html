@@ -13,53 +13,121 @@
 <body>
   <main class="page">
     <section class="library" aria-labelledby="library-title">
-      <h1 class="library__title" id="library-title">Кинотека</h1>
+      <div class="library__header">
+        <h1 class="library__title" id="library-title">Кинотека</h1>
+        <button class="button button--primary" type="button" id="open-add-dialog">Добавить фильм</button>
+      </div>
+
       <p class="library__lead">
         Коллекция фильмов с возможностью добавления новых записей и подбора по жанру, году выпуска и режиссёру.
       </p>
 
-      <section class="library__add" aria-labelledby="add-title">
-        <h2 class="library__subtitle" id="add-title">Добавить фильм</h2>
-        <form class="movie-form" id="add-movie-form" novalidate>
-          <div class="movie-form__fields">
-            <div class="field field--wide">
-              <label class="field__label" for="movie-title">Название</label>
-              <input class="field__input" id="movie-title" name="title" type="text"
-                placeholder="Дюна" autocomplete="off" required>
+      <p class="library__status" id="library-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+
+      <section class="library__filters" aria-label="Подборка фильмов">
+        <form class="filters" id="filter-form" novalidate>
+          <div class="filters__row">
+            <div class="field filters__field filters__field--genre">
+              <label class="field__label" for="filter-genre">Жанр</label>
+              <select class="field__input" id="filter-genre" name="genre">
+                <option value="">Все жанры</option>
+              </select>
             </div>
 
-            <div class="field">
-              <label class="field__label" for="movie-genre">Жанр</label>
-              <input class="field__input" id="movie-genre" name="genre" type="text"
-                placeholder="фантастика" autocomplete="off" required>
+            <div class="field filters__field filters__field--year">
+              <label class="field__label" for="filter-year">После года</label>
+              <input class="field__input" id="filter-year" name="year" type="number" min="1888" step="1"
+                inputmode="numeric" placeholder="1979">
             </div>
 
-            <div class="field">
-              <label class="field__label" for="movie-director">Режиссёр</label>
-              <input class="field__input" id="movie-director" name="director" type="text"
-                placeholder="Дени Вильнёв" autocomplete="off" required>
+            <div class="field filters__field filters__field--director">
+              <label class="field__label" for="filter-director">Режиссёр</label>
+              <select class="field__input" id="filter-director" name="director">
+                <option value="">Все режиссёры</option>
+              </select>
             </div>
 
-            <div class="field">
-              <label class="field__label" for="movie-year">Год выпуска</label>
-              <input class="field__input" id="movie-year" name="year" type="number" min="1888" step="1"
-                inputmode="numeric" placeholder="2021" autocomplete="off" required>
+            <div class="field filters__field filters__field--sort">
+              <label class="field__label" for="filter-sort">Сортировка</label>
+              <select class="field__input" id="filter-sort" name="sort">
+                <option value="default">По порядку коллекции</option>
+                <option value="title">По алфавиту</option>
+              </select>
+            </div>
+
+            <div class="filters__actions">
+              <button class="button button--primary" type="submit">Применить</button>
+              <button class="button button--ghost" type="button" id="reset-filters">Сбросить</button>
             </div>
           </div>
 
-          <p class="form-message" id="form-message" role="status" aria-live="polite" aria-atomic="true" hidden></p>
-
-          <div class="movie-form__footer">
-            <button class="button button--primary" type="submit">Добавить фильм</button>
-          </div>
+          <p class="form-message" id="filter-message" role="status" aria-live="polite" aria-atomic="true" hidden></p>
         </form>
       </section>
 
-      <section class="library__titles" aria-labelledby="titles-title">
-        <h2 class="library__subtitle" id="titles-title">Все названия по алфавиту</h2>
-        <ol class="title-list" id="title-list"></ol>
+      <section class="library__movies" aria-labelledby="movies-title">
+        <div class="library__movies-header">
+          <h2 class="library__subtitle" id="movies-title">Фильмы</h2>
+          <p class="movies__counter" id="movies-counter" aria-live="polite">Показано 10 из 10</p>
+        </div>
+        <div class="table-wrap">
+          <table class="movies-table">
+            <caption class="visually-hidden">Список фильмов</caption>
+            <thead>
+              <tr>
+                <th scope="col">Название</th>
+                <th scope="col">Жанр</th>
+                <th scope="col">Режиссёр</th>
+                <th scope="col">Год выпуска</th>
+              </tr>
+            </thead>
+            <tbody id="movies-body"></tbody>
+          </table>
+        </div>
       </section>
     </section>
+
+    <dialog class="dialog" id="add-movie-dialog" aria-labelledby="add-title">
+      <div class="dialog__header">
+        <h2 class="dialog__title" id="add-title">Добавить фильм</h2>
+        <button class="dialog__close" type="button" id="close-add-dialog"
+          aria-label="Закрыть окно добавления фильма">×</button>
+      </div>
+
+      <form class="movie-form dialog__body" id="add-movie-form" novalidate>
+        <div class="movie-form__fields">
+          <div class="field field--wide">
+            <label class="field__label" for="movie-title">Название</label>
+            <input class="field__input" id="movie-title" name="title" type="text"
+              placeholder="Дюна" autocomplete="off" required>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="movie-genre">Жанр</label>
+            <input class="field__input" id="movie-genre" name="genre" type="text"
+              placeholder="фантастика" autocomplete="off" required>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="movie-director">Режиссёр</label>
+            <input class="field__input" id="movie-director" name="director" type="text"
+              placeholder="Дени Вильнёв" autocomplete="off" required>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="movie-year">Год выпуска</label>
+            <input class="field__input" id="movie-year" name="year" type="number" min="1888" step="1"
+              inputmode="numeric" placeholder="2021" autocomplete="off" required>
+          </div>
+        </div>
+
+        <p class="form-message" id="form-message" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+
+        <div class="movie-form__footer">
+          <button class="button button--primary" type="submit">Добавить фильм</button>
+        </div>
+      </form>
+    </dialog>
   </main>
 
   <noscript>
