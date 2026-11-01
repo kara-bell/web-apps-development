@@ -21,6 +21,26 @@
 
       <p class="message" id="json-message" role="status" aria-live="polite"></p>
 
+      <div class="ws-bar">
+        <span class="ws-status" id="ws-status" data-state="wait">
+          <span class="ws-status__dot" aria-hidden="true"></span>
+          <span id="ws-status-text" aria-live="polite">WS: подключение…</span>
+        </span>
+
+        <label class="switch">
+          <input class="switch__input" id="ws-updates" type="checkbox" role="switch" checked>
+          <span class="switch__track" aria-hidden="true"></span>
+          <span class="switch__label">Онлайн-обновления</span>
+        </label>
+
+        <span class="ws-updated" id="ws-updated">Обновлено: —</span>
+
+        <button class="button button--ghost button--small" type="button" id="ws-refresh"
+          aria-label="Запросить обновление по WebSocket" title="Запросить обновление по WebSocket" disabled>
+          Обновить
+        </button>
+      </div>
+
       <div class="table-wrap" id="runs-container" hidden>
         <table class="table">
           <caption class="visually-hidden">Тестовые прогоны из JSON-файла</caption>
