@@ -19,8 +19,14 @@ const sseStatus = document.querySelector("#sse-status");
 const sseStatusText = document.querySelector("#sse-status-text");
 const eventsList = document.querySelector("#events-list");
 
+const loadXmlButton = document.querySelector("#load-xml");
+const xmlMessage = document.querySelector("#xml-message");
+const xmlContainer = document.querySelector("#xml-container");
+const xmlBody = document.querySelector("#xml-body");
+
 const JSON_URL = "/data/runs.json";
 const RELOAD_URL = "/api/runs/reload";
+const XML_URL = "/data/test-cases.xml";
 const WS_URL = `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/ws`;
 const SSE_URL = "/api/events";
 
@@ -30,14 +36,38 @@ const STATUS_LABELS = {
   running: "Выполняется",
 };
 
+const PRIORITY_LABELS = {
+  high: "Высокий",
+  medium: "Средний",
+  low: "Низкий",
+};
+
 // ============================================================
 // Общий рендер таблицы
 // ============================================================
 
+function setMessageOn(element, text, state = "info") {
+  element.textContent = text;
+  element.classList.toggle("message--error", state === "error");
+  element.classList.toggle("message--success", state === "success");
+}
+
 function setMessage(text, state = "info") {
-  message.textContent = text;
-  message.classList.toggle("message--error", state === "error");
-  message.classList.toggle("message--success", state === "success");
+  setMessageOn(message, text, state);
+}
+
+function setXmlMessage(text, state = "info") {
+  setMessageOn(xmlMessage, text, state);
+}
+
+function appendFileLink(target, url, label) {
+  const fileLink = document.createElement("a");
+  fileLink.className = "message__link";
+  fileLink.href = url;
+  fileLink.target = "_blank";
+  fileLink.rel = "noopener noreferrer";
+  fileLink.textContent = label;
+  target.append(fileLink);
 }
 
 function formatDate(value) {
@@ -97,13 +127,7 @@ function renderRuns(runs) {
 // ============================================================
 
 function showJsonLink() {
-  const fileLink = document.createElement("a");
-  fileLink.className = "message__link";
-  fileLink.href = JSON_URL;
-  fileLink.target = "_blank";
-  fileLink.rel = "noopener noreferrer";
-  fileLink.textContent = "data/runs.json";
-  message.append(fileLink);
+  appendFileLink(message, JSON_URL, "data/runs.json");
 }
 
 async function loadRuns() {
@@ -393,6 +417,113 @@ function connectSse() {
   source.addEventListener("run", handleSseMessage);
   source.addEventListener("info", handleSseMessage);
 }
+
+// ============================================================
+// Пункт 5. AJAX-загрузка XML и вывод тест-кейсов
+// ============================================================
+
+function readCaseText(caseElement, tag) {
+  const node = caseElement.querySelector(tag);
+  return node ? node.textContent.trim() : "—";
+}
+
+function parseTestCase(caseElement) {
+  return {
+    id: caseElement.getAttribute("id") || "—",
+    priority: caseElement.getAttribute("priority") || "unknown",
+    automated: caseElement.getAttribute("automated") === "true",
+    title: readCaseText(caseElement, "title"),
+    suite: readCaseText(caseElement, "suite"),
+    owner: readCaseText(caseElement, "owner"),
+    steps: readCaseText(caseElement, "steps"),
+  };
+}
+
+function createPriorityCell(priority) {
+  const cell = document.createElement("td");
+  const badge = document.createElement("span");
+  badge.className = `badge badge--${priority}`;
+  badge.textContent = PRIORITY_LABELS[priority] || priority;
+  cell.append(badge);
+  return cell;
+}
+
+function createAutomatedCell(automated) {
+  const cell = document.createElement("td");
+  const badge = document.createElement("span");
+  badge.className = automated ? "badge badge--auto" : "badge badge--muted";
+  badge.textContent = automated ? "Да" : "Нет";
+  cell.append(badge);
+  return cell;
+}
+
+function renderTestCases(cases) {
+  xmlBody.replaceChildren();
+
+  for (const testCase of cases) {
+    const row = document.createElement("tr");
+    row.append(
+      createCell(testCase.id),
+      createCell(testCase.title),
+      createCell(testCase.suite),
+      createPriorityCell(testCase.priority),
+      createAutomatedCell(testCase.automated),
+      createCell(testCase.owner),
+      createCell(testCase.steps),
+    );
+    xmlBody.append(row);
+  }
+
+  xmlContainer.hidden = cases.length === 0;
+}
+
+async function loadXml() {
+  loadXmlButton.disabled = true;
+  loadXmlButton.setAttribute("aria-busy", "true");
+  setXmlMessage("Загрузка XML…");
+
+  try {
+    const response = await fetch(XML_URL, {
+      headers: { Accept: "application/xml" },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const text = await response.text();
+    const documentXml = new DOMParser().parseFromString(text, "application/xml");
+
+    if (documentXml.querySelector("parsererror")) {
+      throw new Error("Ошибка разбора XML");
+    }
+
+    const cases = Array.from(documentXml.querySelectorAll("case")).map(parseTestCase);
+
+    if (cases.length === 0) {
+      xmlContainer.hidden = true;
+      setXmlMessage("В XML-файле нет тест-кейсов.");
+      return;
+    }
+
+    renderTestCases(cases);
+    setXmlMessage(`Загружено тест-кейсов: ${cases.length}. Файл: `, "success");
+    appendFileLink(xmlMessage, XML_URL, "data/test-cases.xml");
+  } catch (error) {
+    console.error("Ошибка загрузки XML:", error);
+    xmlContainer.hidden = true;
+    setXmlMessage(
+      "Не удалось загрузить XML. Проверьте файл и соединение с сервером.",
+      "error",
+    );
+  } finally {
+    loadXmlButton.disabled = false;
+    loadXmlButton.removeAttribute("aria-busy");
+  }
+}
+
+loadXmlButton.addEventListener("click", loadXml);
 
 loadButton.addEventListener("click", loadRuns);
 

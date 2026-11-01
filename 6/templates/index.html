@@ -75,6 +75,36 @@
         <li class="events__empty" id="events-empty">События появятся после подключения к серверу.</li>
       </ul>
     </section>
+
+    <section class="panel" aria-labelledby="xml-title">
+      <div class="panel__head">
+        <div>
+          <h2 class="panel__title" id="xml-title">XML-каталог тест-кейсов</h2>
+          <p class="panel__hint">Данные загружаются из XML-файла по AJAX и разбираются через DOMParser.</p>
+        </div>
+        <button class="button button--ghost" type="button" id="load-xml">Загрузить XML</button>
+      </div>
+
+      <p class="message" id="xml-message" role="status" aria-live="polite"></p>
+
+      <div class="table-wrap" id="xml-container" hidden>
+        <table class="table table--xml">
+          <caption class="visually-hidden">Тест-кейсы из XML-файла</caption>
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Название</th>
+              <th scope="col">Набор</th>
+              <th scope="col">Приоритет</th>
+              <th scope="col">Автоматизация</th>
+              <th scope="col">Ответственный</th>
+              <th scope="col">Шаги</th>
+            </tr>
+          </thead>
+          <tbody id="xml-body"></tbody>
+        </table>
+      </div>
+    </section>
   </main>
 
   <noscript>

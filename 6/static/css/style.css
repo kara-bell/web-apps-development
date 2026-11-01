@@ -395,6 +395,18 @@ h1 {
   border-bottom: 0;
 }
 
+.table--xml th,
+.table--xml td {
+  padding: var(--space-2);
+}
+
+.table--xml td:nth-child(1),
+.table--xml td:nth-child(4),
+.table--xml td:nth-child(5),
+.table--xml td:nth-child(7) {
+  white-space: nowrap;
+}
+
 .badge {
   display: inline-block;
   padding: 0.1rem 0.55rem;
@@ -417,6 +429,32 @@ h1 {
 .badge--running {
   color: var(--color-warning-700);
   background: var(--color-warning-bg);
+}
+
+.badge--high {
+  color: var(--color-danger-700);
+  background: var(--color-danger-bg);
+}
+
+.badge--medium {
+  color: var(--color-warning-700);
+  background: var(--color-warning-bg);
+}
+
+.badge--low {
+  color: var(--color-success-700);
+  background: var(--color-success-bg);
+}
+
+.badge--auto {
+  color: var(--color-primary-700);
+  background: var(--color-primary-50);
+}
+
+.badge--muted {
+  color: var(--color-ink-500);
+  background: var(--color-bg-muted);
+  border: 1px solid var(--color-border);
 }
 
 .visually-hidden {
