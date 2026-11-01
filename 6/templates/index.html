@@ -12,164 +12,163 @@
 </head>
 
 <body>
-  <main class="page">
-    <section class="panel" aria-labelledby="page-title">
-      <div class="panel__head">
-        <h1 class="panel__title" id="page-title">Монитор тестовых прогонов</h1>
-        <button class="button" type="button" id="load-json">Загрузить данные из JSON</button>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand__name">QualityHub</span>
+        <span class="brand__subtitle">Монитор тестовых прогонов</span>
       </div>
+    </header>
 
-      <p class="message" id="json-message" role="status" aria-live="polite"></p>
+    <main class="dashboard">
+      <section class="panel panel--runs" aria-labelledby="page-title">
+        <div class="panel__head panel__head--runs">
+          <h1 class="panel__title" id="page-title">Тестовые прогоны</h1>
 
-      <div class="ws-bar">
-        <span class="stream-status" id="ws-status" data-state="wait">
-          <span class="stream-status__dot" aria-hidden="true"></span>
-          <span id="ws-status-text" aria-live="polite">WS: подключение…</span>
-        </span>
+          <div class="runs-head__tools">
+            <div class="ws-bar">
+              <span class="stream-status" id="ws-status" data-state="wait" title="WebSocket: подключение…">
+                <span class="stream-status__dot" aria-hidden="true"></span>
+                <span id="ws-status-text">WS: подключение…</span>
+              </span>
 
-        <label class="switch">
-          <input class="switch__input" id="ws-updates" type="checkbox" role="switch" checked>
-          <span class="switch__track" aria-hidden="true"></span>
-          <span class="switch__label">Онлайн-обновления</span>
-        </label>
+              <label class="switch" title="Онлайн-обновления статусов">
+                <input class="switch__input" id="ws-updates" type="checkbox" role="switch"
+                  aria-label="Онлайн-обновления статусов" checked>
+                <span class="switch__track" aria-hidden="true"></span>
+              </label>
 
-        <span class="ws-updated" id="ws-updated">Обновлено: —</span>
+              <span class="ws-updated" id="ws-updated" title="Последнее обновление">—</span>
 
-        <button class="button button--ghost button--small" type="button" id="ws-refresh"
-          aria-label="Запросить обновление по WebSocket" title="Запросить обновление по WebSocket" disabled>
-          Обновить
-        </button>
-      </div>
+              <button class="button button--ghost button--small button--icon" type="button" id="ws-refresh"
+                aria-label="Запросить обновление по WebSocket" title="Запросить обновление по WebSocket" disabled>
+                🔄
+              </button>
+            </div>
 
-      <div class="runs-toolbar">
-        <label class="toolbar__field" for="status-filter">
-          Статус
-          <select id="status-filter" disabled>
-            <option value="all">Все</option>
-            <option value="passed">Пройден</option>
-            <option value="failed">Провален</option>
-            <option value="running">Выполняется</option>
-          </select>
-        </label>
-
-        <label class="toolbar__field" for="sort-order">
-          Сортировка
-          <select id="sort-order" disabled>
-            <option value="default">Как в файле</option>
-            <option value="duration-asc">Длительность ↑</option>
-            <option value="duration-desc">Длительность ↓</option>
-            <option value="suite">Набор тестов</option>
-          </select>
-        </label>
-      </div>
-
-      <p class="runs-summary" id="runs-summary" aria-live="polite" hidden></p>
-
-      <div class="table-wrap" id="runs-container" hidden>
-        <table class="table">
-          <caption class="visually-hidden">Тестовые прогоны из JSON-файла</caption>
-          <thead>
-            <tr>
-              <th scope="col">Набор</th>
-              <th scope="col">Статус</th>
-              <th scope="col">Длительность</th>
-              <th scope="col">Автор</th>
-              <th scope="col">Запуск</th>
-            </tr>
-          </thead>
-          <tbody id="runs-body"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="panel" aria-labelledby="events-title">
-      <div class="panel__head panel__head--top">
-        <div>
-          <h2 class="panel__title" id="events-title">Лента событий</h2>
-          <p class="panel__hint">Односторонние обновления от сервера по Server Sent Events.</p>
+            <button class="button button--small button--ghost" type="button" id="load-json">
+              Загрузить JSON
+            </button>
+            <button class="button button--small" type="button" id="open-run-dialog"
+              title="Добавить прогон" aria-label="Добавить прогон">+ Добавить</button>
+          </div>
         </div>
 
-        <span class="stream-status" id="sse-status" data-state="wait">
-          <span class="stream-status__dot" aria-hidden="true"></span>
-          <span id="sse-status-text" aria-live="polite">SSE: подключение…</span>
-        </span>
-      </div>
+        <p class="message" id="json-message" role="status" aria-live="polite"></p>
 
-      <ul class="events" id="events-list" aria-live="polite">
-        <li class="events__empty" id="events-empty">События появятся после подключения к серверу.</li>
-      </ul>
-    </section>
-
-    <section class="panel" aria-labelledby="xml-title">
-      <div class="panel__head">
-        <div>
-          <h2 class="panel__title" id="xml-title">XML-каталог тест-кейсов</h2>
-        </div>
-        <button class="button button--ghost" type="button" id="load-xml">Загрузить XML</button>
-      </div>
-
-      <p class="message" id="xml-message" role="status" aria-live="polite"></p>
-
-      <div class="xml-tools">
-        <label class="toolbar__field" for="xml-filter">
-          Фильтр
-          <select id="xml-filter" disabled>
-            <option value="all">Все кейсы</option>
-            <option value="high">Только высокие</option>
-            <option value="automated">Только автоматизированные</option>
-          </select>
-        </label>
-
-        <div class="xml-edit-block">
-          <label class="toolbar__field" for="xml-case-select">
-            Кейс для изменения
-            <select id="xml-case-select" disabled>
-              <option value="">Сначала загрузите XML</option>
+        <div class="runs-toolbar">
+          <label class="toolbar__field" for="status-filter">
+            Статус
+            <select id="status-filter" disabled>
+              <option value="all">Все</option>
+              <option value="passed">Пройден</option>
+              <option value="failed">Провален</option>
+              <option value="running">Выполняется</option>
             </select>
           </label>
 
-          <label class="toolbar__field" for="xml-priority">
-            Новый приоритет
-            <select id="xml-priority" disabled>
-              <option value="high">Высокий</option>
-              <option value="medium">Средний</option>
-              <option value="low">Низкий</option>
+          <label class="toolbar__field" for="sort-order">
+            Сортировка
+            <select id="sort-order" disabled>
+              <option value="default">Как в файле</option>
+              <option value="duration-asc">Длительность ↑</option>
+              <option value="duration-desc">Длительность ↓</option>
+              <option value="suite">Набор тестов</option>
             </select>
           </label>
-
-          <button class="button button--ghost button--small" type="button" id="xml-change-priority" disabled>
-            Изменить приоритет
-          </button>
         </div>
-      </div>
 
-      <p class="message" id="xml-result" role="status" aria-live="polite"></p>
+        <p class="runs-summary" id="runs-summary" aria-live="polite" hidden></p>
 
-      <div class="table-wrap" id="xml-container" hidden>
-        <table class="table table--xml">
-          <caption class="visually-hidden">Тест-кейсы из XML-файла</caption>
-          <thead>
-            <tr>
-              <th scope="col">ID</th>
-              <th scope="col">Название</th>
-              <th scope="col">Набор</th>
-              <th scope="col">Приоритет</th>
-              <th scope="col">Автоматизация</th>
-              <th scope="col">Ответственный</th>
-              <th scope="col">Шаги</th>
-            </tr>
-          </thead>
-          <tbody id="xml-body"></tbody>
-        </table>
-      </div>
-    </section>
+        <div class="table-wrap table-wrap--grow" id="runs-container" hidden>
+          <table class="table">
+            <caption class="visually-hidden">Тестовые прогоны из JSON-файла</caption>
+            <thead>
+              <tr>
+                <th scope="col">Набор</th>
+                <th scope="col">Статус</th>
+                <th scope="col">Длительность</th>
+                <th scope="col">Автор</th>
+                <th scope="col">Запуск</th>
+              </tr>
+            </thead>
+            <tbody id="runs-body"></tbody>
+          </table>
+        </div>
+      </section>
 
-    <section class="panel" aria-labelledby="form-title">
-      <div class="panel__head">
-        <h2 class="panel__title" id="form-title">Новый прогон</h2>
-      </div>
+      <section class="panel panel--events" aria-labelledby="events-title">
+        <div class="panel__head panel__head--top">
+          <div>
+            <h2 class="panel__title" id="events-title">Лента событий</h2>
+          </div>
 
-      <form class="run-form" id="run-form" novalidate>
+          <span class="stream-status" id="sse-status" data-state="wait">
+            <span class="stream-status__dot" aria-hidden="true"></span>
+            <span id="sse-status-text" aria-live="polite">SSE: подключение…</span>
+          </span>
+        </div>
+
+        <ul class="events" id="events-list" aria-live="polite">
+          <li class="events__empty" id="events-empty">События появятся после подключения к серверу.</li>
+        </ul>
+      </section>
+
+      <section class="panel panel--xml" aria-labelledby="xml-title">
+        <div class="panel__head">
+          <h2 class="panel__title" id="xml-title">XML-каталог</h2>
+          <div class="panel__actions">
+            <button class="button button--small button--ghost" type="button" id="load-xml">Загрузить XML</button>
+            <button class="button button--small button--ghost" type="button" id="open-xml-dialog" disabled>
+              Изменить
+            </button>
+          </div>
+        </div>
+
+        <p class="message" id="xml-message" role="status" aria-live="polite"></p>
+
+        <div class="runs-toolbar">
+          <label class="toolbar__field" for="xml-filter">
+            <span class="toolbar__label-text">Фильтр</span>
+            <select id="xml-filter" disabled>
+              <option value="all">Все кейсы</option>
+              <option value="high">Только высокие</option>
+              <option value="automated">Только автоматизированные</option>
+            </select>
+          </label>
+        </div>
+
+        <p class="message" id="xml-result" role="status" aria-live="polite"></p>
+
+        <div class="table-wrap table-wrap--grow" id="xml-container" hidden>
+          <table class="table table--xml">
+            <caption class="visually-hidden">Тест-кейсы из XML-файла</caption>
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Название</th>
+                <th scope="col">Набор</th>
+                <th scope="col">Приоритет</th>
+                <th scope="col">Автоматизация</th>
+                <th scope="col">Ответственный</th>
+                <th scope="col">Шаги</th>
+              </tr>
+            </thead>
+            <tbody id="xml-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="modal" id="run-dialog" aria-labelledby="run-dialog-title">
+    <div class="modal__head">
+      <h2 class="modal__title" id="run-dialog-title">Новый прогон</h2>
+      <button class="modal__close" type="button" data-close-dialog aria-label="Закрыть">×</button>
+    </div>
+
+    <form class="run-form" id="run-form" novalidate>
+      <div class="modal__body">
         <div class="run-form__grid">
           <div class="field">
             <label class="field__label" for="suite">Набор тестов</label>
@@ -203,9 +202,44 @@
           <button class="button" type="submit" id="submit-run">Добавить прогон</button>
           <p class="message" id="form-message" role="alert"></p>
         </div>
-      </form>
-    </section>
-  </main>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="xml-dialog" aria-labelledby="xml-dialog-title">
+    <div class="modal__head">
+      <h2 class="modal__title" id="xml-dialog-title">Изменить тест-кейс</h2>
+      <button class="modal__close" type="button" data-close-dialog aria-label="Закрыть">×</button>
+    </div>
+
+    <div class="modal__body">
+      <div class="xml-edit-block">
+        <label class="toolbar__field" for="xml-case-select">
+          Кейс
+          <select id="xml-case-select" disabled>
+            <option value="">Сначала загрузите XML</option>
+          </select>
+        </label>
+
+        <label class="toolbar__field" for="xml-priority">
+          Новый приоритет
+          <select id="xml-priority" disabled>
+            <option value="high">Высокий</option>
+            <option value="medium">Средний</option>
+            <option value="low">Низкий</option>
+          </select>
+        </label>
+
+        <button class="button button--small" type="button" id="xml-change-priority" disabled>
+          Изменить приоритет
+        </button>
+      </div>
+
+      <p class="message" id="xml-dialog-message" role="alert"></p>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
   <noscript>
     <p class="noscript">Для работы монитора нужен JavaScript.</p>

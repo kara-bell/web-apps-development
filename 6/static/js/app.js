@@ -40,6 +40,13 @@ const statusInput = document.querySelector("#status");
 const submitRunButton = document.querySelector("#submit-run");
 const formMessage = document.querySelector("#form-message");
 
+const openRunDialogButton = document.querySelector("#open-run-dialog");
+const runDialog = document.querySelector("#run-dialog");
+const openXmlDialogButton = document.querySelector("#open-xml-dialog");
+const xmlDialog = document.querySelector("#xml-dialog");
+const xmlDialogMessage = document.querySelector("#xml-dialog-message");
+const toast = document.querySelector("#toast");
+
 const JSON_URL = "/data/runs.json";
 const RELOAD_URL = "/api/runs/reload";
 const XML_URL = "/data/test-cases.xml";
@@ -267,9 +274,11 @@ let socket = null;
 let reconnectTimer = null;
 let firstConnection = true;
 
-function setWsState(state, text) {
+function setWsState(state, text, title = text) {
   wsStatus.dataset.state = state;
   wsStatusText.textContent = text;
+  wsStatus.title = title;
+  wsStatus.setAttribute("aria-label", title);
   wsRefresh.disabled = state !== "on";
 }
 
@@ -293,7 +302,9 @@ function applySnapshot(payload) {
   setRuns(payload.runs);
 
   if (payload.serverTime) {
-    wsUpdated.textContent = `Обновлено: ${formatTime(payload.serverTime)}`;
+    const time = formatTime(payload.serverTime);
+    wsUpdated.textContent = time;
+    wsUpdated.title = `Последнее обновление: ${time}`;
   }
 }
 
@@ -318,7 +329,7 @@ function connectWebSocket() {
   }
 
   if (firstConnection) {
-    setWsState("wait", "WS: подключение…");
+    setWsState("wait", "WS: подключение…", "WebSocket: подключение…");
     firstConnection = false;
   }
 
@@ -326,13 +337,13 @@ function connectWebSocket() {
     socket = new WebSocket(WS_URL);
   } catch (error) {
     console.error("Не удалось создать WebSocket:", error);
-    setWsState("off", "WS: недоступен");
+    setWsState("off", "WS: недоступен", "WebSocket: недоступен");
     scheduleReconnect();
     return;
   }
 
   socket.addEventListener("open", () => {
-    setWsState("on", "WS: подключено");
+    setWsState("on", "WS", "WebSocket: подключено");
     sendWs({ type: "updates", enabled: wsUpdates.checked });
     sendWs({ type: "refresh" });
   });
@@ -353,12 +364,12 @@ function connectWebSocket() {
   });
 
   socket.addEventListener("error", () => {
-    setWsState("wait", "WS: переподключение…");
+    setWsState("wait", "WS: переподключение…", "WebSocket: переподключение…");
   });
 
   socket.addEventListener("close", () => {
     socket = null;
-    setWsState("wait", "WS: переподключение…");
+    setWsState("wait", "WS: переподключение…", "WebSocket: переподключение…");
     scheduleReconnect();
   });
 }
@@ -382,9 +393,11 @@ let sseSource = null;
 let sseReconnectTimer = null;
 let firstSseConnection = true;
 
-function setSseState(state, text) {
+function setSseState(state, text, title = text) {
   sseStatus.dataset.state = state;
   sseStatusText.textContent = text;
+  sseStatus.title = title;
+  sseStatus.setAttribute("aria-label", title);
 }
 
 function appendEvent({ time, text, status }) {
@@ -440,7 +453,7 @@ function handleSseMessage(event) {
       text: payload.message,
     });
   } else if (event.type === "hello") {
-    setSseState("on", "SSE: подключено");
+    setSseState("on", "SSE", "SSE: подключено");
   }
 }
 
@@ -479,7 +492,7 @@ function connectSse() {
   sseSource = source;
 
   source.addEventListener("open", () => {
-    setSseState("on", "SSE: подключено");
+    setSseState("on", "SSE", "SSE: подключено");
   });
 
   source.addEventListener("error", () => {
@@ -631,14 +644,14 @@ function changePriority() {
   const caseId = xmlCaseSelect.value;
 
   if (!caseId) {
-    setMessageOn(xmlResult, "Выберите тест-кейс.", "error");
+    setMessageOn(xmlDialogMessage, "Выберите тест-кейс.", "error");
     return;
   }
 
   const testCase = xmlCases.find((item) => item.id === caseId);
 
   if (!testCase || !testCase.element) {
-    setMessageOn(xmlResult, "Тест-кейс не найден.", "error");
+    setMessageOn(xmlDialogMessage, "Тест-кейс не найден.", "error");
     return;
   }
 
@@ -647,11 +660,9 @@ function changePriority() {
   testCase.priority = newPriority;
 
   renderXmlView();
-  setMessageOn(
-    xmlResult,
-    `Приоритет ${caseId} изменён на «${PRIORITY_LABELS[newPriority]}».`,
-    "success",
-  );
+  setMessageOn(xmlDialogMessage, "");
+  xmlDialog.close();
+  showToast(`Приоритет ${caseId} изменён на «${PRIORITY_LABELS[newPriority]}».`);
 }
 
 async function loadXml() {
@@ -691,6 +702,7 @@ async function loadXml() {
     xmlFilter.disabled = false;
     xmlPriority.disabled = false;
     xmlChangePriority.disabled = true;
+    openXmlDialogButton.disabled = false;
     populateXmlCaseSelect();
     renderXmlView();
 
@@ -717,6 +729,38 @@ loadXmlButton.addEventListener("click", loadXml);
 
 function setFormMessage(text, state = "info") {
   setMessageOn(formMessage, text, state);
+}
+
+let toastTimer = null;
+
+function showToast(text, state = "success") {
+  toast.textContent = text;
+  toast.dataset.state = state;
+  toast.hidden = false;
+
+  if (toastTimer !== null) {
+    window.clearTimeout(toastTimer);
+  }
+
+  toastTimer = window.setTimeout(() => {
+    toast.hidden = true;
+  }, 3200);
+}
+
+function openRunDialog() {
+  setFormMessage("");
+  if (!runDialog.open) {
+    runDialog.showModal();
+  }
+}
+
+function openXmlDialog() {
+  xmlCaseSelect.value = "";
+  xmlChangePriority.disabled = true;
+  setMessageOn(xmlDialogMessage, "");
+  if (!xmlDialog.open) {
+    xmlDialog.showModal();
+  }
 }
 
 function validateRunForm(suite, author, duration) {
@@ -782,12 +826,9 @@ async function submitRun(event) {
     }
 
     setRuns(payload.runs);
-    setFormMessage(
-      `Прогон «${payload.created?.suite || suite}» добавлен.`,
-      "success",
-    );
     runForm.reset();
-    suiteInput.focus();
+    runDialog.close();
+    showToast(`Прогон «${payload.created?.suite || suite}» добавлен.`);
   } catch (error) {
     console.error("Ошибка добавления прогона:", error);
     setFormMessage(error.message || "Не удалось добавить прогон.", "error");
@@ -798,6 +839,22 @@ async function submitRun(event) {
 }
 
 runForm.addEventListener("submit", submitRun);
+openRunDialogButton.addEventListener("click", openRunDialog);
+openXmlDialogButton.addEventListener("click", openXmlDialog);
+
+document.querySelectorAll("[data-close-dialog]").forEach((button) => {
+  button.addEventListener("click", () => {
+    button.closest("dialog")?.close();
+  });
+});
+
+[runDialog, xmlDialog].forEach((dialog) => {
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog) {
+      dialog.close();
+    }
+  });
+});
 
 xmlFilter.addEventListener("change", renderXmlView);
 xmlCaseSelect.addEventListener("change", () => {
