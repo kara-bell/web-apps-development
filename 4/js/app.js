@@ -50,23 +50,35 @@ function divide(a, b) {
   return a / b;
 }
 
+function power(a, b) {
+  return a ** b;
+}
+
+function squareRoot(a) {
+  return Math.sqrt(a);
+}
+
 // ---------- Обработка событий ----------
 
 const operations = {
   add,
   subtract,
   multiply,
-  divide
+  divide,
+  power,
+  sqrt: squareRoot
 };
 
 const operationSymbols = {
   add: "+",
   subtract: "−",
   multiply: "×",
-  divide: "÷"
+  divide: "÷",
+  power: "^"
 };
 
 let lastCalculation = null;
+let activeButton = null;
 
 keys.addEventListener("click", handleKeyClick);
 inputA.addEventListener("input", handleInput);
@@ -79,6 +91,7 @@ function handleKeyClick(event) {
     return;
   }
 
+  setActiveOperation(button);
   lastCalculation = runOperation(button.dataset.op);
   renderCalculation(lastCalculation);
 }
@@ -94,6 +107,23 @@ function runOperation(op) {
     return { ok: false, error: a.error };
   }
 
+  if (op === "sqrt") {
+    if (a.value < 0) {
+      return { ok: false, error: "Корень из отрицательного числа не вычисляется." };
+    }
+
+    const value = operation(a.value);
+    if (!Number.isFinite(value)) {
+      return { ok: false, error: "Результат слишком велик." };
+    }
+
+    return {
+      ok: true,
+      expression: `√${a.value}`,
+      value
+    };
+  }
+
   const b = readNumber(inputB, "B");
   if (b.error) {
     return { ok: false, error: b.error };
@@ -103,17 +133,52 @@ function runOperation(op) {
     return { ok: false, error: "Деление на ноль невозможно." };
   }
 
+  const value = operation(a.value, b.value);
+
+  if (!Number.isFinite(value)) {
+    return {
+      ok: false,
+      error: Number.isNaN(value)
+        ? "Результат не является числом."
+        : "Результат слишком велик."
+    };
+  }
+
   return {
     ok: true,
     expression: `${a.value} ${operationSymbols[op]} ${b.value}`,
-    value: operation(a.value, b.value)
+    value
   };
 }
 
 function handleInput() {
+  clearActiveOperation();
+
   if (!message.hidden) {
     resetDisplay();
   }
+}
+
+function setActiveOperation(button) {
+  if (activeButton === button) {
+    return;
+  }
+
+  if (activeButton) {
+    activeButton.classList.remove("key--active");
+  }
+
+  activeButton = button;
+  activeButton.classList.add("key--active");
+}
+
+function clearActiveOperation() {
+  if (!activeButton) {
+    return;
+  }
+
+  activeButton.classList.remove("key--active");
+  activeButton = null;
 }
 
 function renderCalculation(calculation) {
@@ -134,6 +199,13 @@ function renderCalculation(calculation) {
   expression.textContent = `${calculation.expression} =`;
   result.textContent = formatNumber(calculation.value);
   clearMessage();
+  animateResult();
+}
+
+function animateResult() {
+  result.classList.remove("is-updated");
+  void result.offsetWidth;
+  result.classList.add("is-updated");
 }
 
 function formatNumber(value) {
@@ -143,18 +215,24 @@ function formatNumber(value) {
 function showError(text) {
   expression.textContent = "Проверьте ввод";
   result.textContent = "—";
+  result.classList.remove("is-updated");
   message.textContent = text;
   message.hidden = false;
+  message.classList.remove("is-visible");
+  void message.offsetWidth;
+  message.classList.add("is-visible");
 }
 
 function clearMessage() {
   message.textContent = "";
   message.hidden = true;
+  message.classList.remove("is-visible");
 }
 
 function resetDisplay() {
   expression.textContent = "Введите числа и выберите операцию";
   result.textContent = "0";
+  result.classList.remove("is-updated");
   clearMessage();
 }
 
@@ -162,6 +240,7 @@ function resetCalculator() {
   inputA.value = "";
   inputB.value = "";
   lastCalculation = null;
+  clearActiveOperation();
   resetDisplay();
   inputA.focus();
 }
