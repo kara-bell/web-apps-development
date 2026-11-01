@@ -104,12 +104,46 @@
       <div class="panel__head">
         <div>
           <h2 class="panel__title" id="xml-title">XML-каталог тест-кейсов</h2>
-          <p class="panel__hint">Данные загружаются из XML-файла по AJAX и разбираются через DOMParser.</p>
         </div>
         <button class="button button--ghost" type="button" id="load-xml">Загрузить XML</button>
       </div>
 
       <p class="message" id="xml-message" role="status" aria-live="polite"></p>
+
+      <div class="xml-tools">
+        <label class="toolbar__field" for="xml-filter">
+          Фильтр
+          <select id="xml-filter" disabled>
+            <option value="all">Все кейсы</option>
+            <option value="high">Только высокие</option>
+            <option value="automated">Только автоматизированные</option>
+          </select>
+        </label>
+
+        <div class="xml-edit-block">
+          <label class="toolbar__field" for="xml-case-select">
+            Кейс для изменения
+            <select id="xml-case-select" disabled>
+              <option value="">Сначала загрузите XML</option>
+            </select>
+          </label>
+
+          <label class="toolbar__field" for="xml-priority">
+            Новый приоритет
+            <select id="xml-priority" disabled>
+              <option value="high">Высокий</option>
+              <option value="medium">Средний</option>
+              <option value="low">Низкий</option>
+            </select>
+          </label>
+
+          <button class="button button--ghost button--small" type="button" id="xml-change-priority" disabled>
+            Изменить приоритет
+          </button>
+        </div>
+      </div>
+
+      <p class="message" id="xml-result" role="status" aria-live="polite"></p>
 
       <div class="table-wrap" id="xml-container" hidden>
         <table class="table table--xml">

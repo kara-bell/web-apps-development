@@ -26,6 +26,11 @@ const loadXmlButton = document.querySelector("#load-xml");
 const xmlMessage = document.querySelector("#xml-message");
 const xmlContainer = document.querySelector("#xml-container");
 const xmlBody = document.querySelector("#xml-body");
+const xmlFilter = document.querySelector("#xml-filter");
+const xmlCaseSelect = document.querySelector("#xml-case-select");
+const xmlPriority = document.querySelector("#xml-priority");
+const xmlChangePriority = document.querySelector("#xml-change-priority");
+const xmlResult = document.querySelector("#xml-result");
 
 const JSON_URL = "/data/runs.json";
 const RELOAD_URL = "/api/runs/reload";
@@ -501,6 +506,7 @@ function parseTestCase(caseElement) {
     suite: readCaseText(caseElement, "suite"),
     owner: readCaseText(caseElement, "owner"),
     steps: readCaseText(caseElement, "steps"),
+    element: caseElement,
   };
 }
 
@@ -522,24 +528,122 @@ function createAutomatedCell(automated) {
   return cell;
 }
 
+let xmlCases = [];
+let xmlLoaded = false;
+
 function renderTestCases(cases) {
   xmlBody.replaceChildren();
 
-  for (const testCase of cases) {
+  if (cases.length === 0) {
     const row = document.createElement("tr");
-    row.append(
-      createCell(testCase.id),
-      createCell(testCase.title),
-      createCell(testCase.suite),
-      createPriorityCell(testCase.priority),
-      createAutomatedCell(testCase.automated),
-      createCell(testCase.owner),
-      createCell(testCase.steps),
-    );
+    row.className = "table__empty";
+    const cell = document.createElement("td");
+    cell.colSpan = 7;
+    cell.textContent = xmlLoaded
+      ? "Нет тест-кейсов по выбранному фильтру."
+      : "";
+    row.append(cell);
     xmlBody.append(row);
+  } else {
+    for (const testCase of cases) {
+      const row = document.createElement("tr");
+      row.append(
+        createCell(testCase.id),
+        createCell(testCase.title),
+        createCell(testCase.suite),
+        createPriorityCell(testCase.priority),
+        createAutomatedCell(testCase.automated),
+        createCell(testCase.owner),
+        createCell(testCase.steps),
+      );
+      xmlBody.append(row);
+    }
   }
 
-  xmlContainer.hidden = cases.length === 0;
+  xmlContainer.hidden = !xmlLoaded;
+}
+
+function getVisibleXmlCases() {
+  const mode = xmlFilter.value;
+
+  if (mode === "high") {
+    return xmlCases.filter((testCase) => testCase.priority === "high");
+  }
+
+  if (mode === "automated") {
+    return xmlCases.filter((testCase) => testCase.automated);
+  }
+
+  return [...xmlCases];
+}
+
+function updateXmlFilterResult(cases) {
+  if (!xmlLoaded) {
+    return;
+  }
+
+  const labels = {
+    all: "Все кейсы",
+    high: "Высокий приоритет",
+    automated: "Автоматизированные",
+  };
+
+  setMessageOn(
+    xmlResult,
+    `${labels[xmlFilter.value] || "Кейсы"}: ${cases.length} из ${xmlCases.length}.`,
+    "success",
+  );
+}
+
+function renderXmlView() {
+  const visibleCases = getVisibleXmlCases();
+  renderTestCases(visibleCases);
+  updateXmlFilterResult(visibleCases);
+}
+
+function populateXmlCaseSelect() {
+  xmlCaseSelect.replaceChildren();
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Выберите кейс";
+  xmlCaseSelect.append(placeholder);
+
+  for (const testCase of xmlCases) {
+    const option = document.createElement("option");
+    option.value = testCase.id;
+    option.textContent = `${testCase.id} — ${testCase.title}`;
+    xmlCaseSelect.append(option);
+  }
+
+  xmlCaseSelect.disabled = false;
+}
+
+function changePriority() {
+  const caseId = xmlCaseSelect.value;
+
+  if (!caseId) {
+    setMessageOn(xmlResult, "Выберите тест-кейс.", "error");
+    return;
+  }
+
+  const testCase = xmlCases.find((item) => item.id === caseId);
+
+  if (!testCase || !testCase.element) {
+    setMessageOn(xmlResult, "Тест-кейс не найден.", "error");
+    return;
+  }
+
+  const newPriority = xmlPriority.value;
+  testCase.element.setAttribute("priority", newPriority);
+  testCase.priority = newPriority;
+
+  renderXmlView();
+  setMessageOn(
+    xmlResult,
+    `Приоритет ${caseId} изменён на «${PRIORITY_LABELS[newPriority]}».`,
+    "success",
+  );
 }
 
 async function loadXml() {
@@ -572,7 +676,16 @@ async function loadXml() {
       return;
     }
 
-    renderTestCases(cases);
+    xmlCases = cases;
+    xmlLoaded = true;
+
+    xmlFilter.value = "all";
+    xmlFilter.disabled = false;
+    xmlPriority.disabled = false;
+    xmlChangePriority.disabled = true;
+    populateXmlCaseSelect();
+    renderXmlView();
+
     setXmlMessage(`Загружено тест-кейсов: ${cases.length}. Файл: `, "success");
     appendFileLink(xmlMessage, XML_URL, "data/test-cases.xml");
   } catch (error) {
@@ -589,6 +702,12 @@ async function loadXml() {
 }
 
 loadXmlButton.addEventListener("click", loadXml);
+
+xmlFilter.addEventListener("change", renderXmlView);
+xmlCaseSelect.addEventListener("change", () => {
+  xmlChangePriority.disabled = !xmlCaseSelect.value;
+});
+xmlChangePriority.addEventListener("click", changePriority);
 
 statusFilter.addEventListener("change", renderRunsView);
 sortOrder.addEventListener("change", renderRunsView);
