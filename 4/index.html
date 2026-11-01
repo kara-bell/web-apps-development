@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Калькулятор</title>
+  <meta name="description"
+    content="Учебный калькулятор на JavaScript: базовые арифметические операции, корень и степень.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <main class="page">
+    <section class="calc" aria-labelledby="calc-title">
+      <h1 class="calc__title" id="calc-title">Калькулятор</h1>
+
+      <div class="calc__fields">
+        <div class="field">
+          <label class="field__label" for="operand-a">Значение A</label>
+          <input class="field__input" id="operand-a" name="operand-a" type="number" step="any" inputmode="decimal"
+            placeholder="Например, 12" autocomplete="off">
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="operand-b">Значение B</label>
+          <input class="field__input" id="operand-b" name="operand-b" type="number" step="any" inputmode="decimal"
+            placeholder="Например, 8" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="calc__keys" role="group" aria-label="Арифметические операции">
+        <button class="key" type="button" data-op="add" aria-label="Сложить A и B">A + B</button>
+        <button class="key" type="button" data-op="subtract" aria-label="Вычесть B из A">A − B</button>
+        <button class="key" type="button" data-op="multiply" aria-label="Умножить A на B">A × B</button>
+        <button class="key" type="button" data-op="divide" aria-label="Разделить A на B">A ÷ B</button>
+        <button class="key" type="button" data-op="power" aria-label="Возвести A в степень B">A ^ B</button>
+        <button class="key" type="button" data-op="sqrt" aria-label="Квадратный корень из A">√A</button>
+      </div>
+
+      <div class="calc__result" aria-live="polite" aria-atomic="true">
+        <p class="calc__expression" id="expression">Введите числа и выберите операцию</p>
+        <output class="calc__output" id="result" for="operand-a operand-b">0</output>
+      </div>
+
+      <p class="calc__message" id="message" role="alert" hidden></p>
+
+      <div class="calc__actions">
+        <button class="button button--ghost" type="button" id="reset">Сбросить</button>
+      </div>
+    </section>
+  </main>
+
+  <noscript>
+    <p class="noscript">Для работы калькулятора нужен JavaScript.</p>
+  </noscript>
+</body>
+
+</html>
