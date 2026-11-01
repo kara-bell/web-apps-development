@@ -20,7 +20,6 @@
   --color-border-strong: #cbd5e1;
 
   --color-success-700: #166534;
-  --color-success-bg: #dcfce7;
   --color-warning-700: #92400e;
   --color-warning-bg: #fef3c7;
   --color-danger-700: #991b1b;
@@ -42,7 +41,6 @@
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
-  --space-5: 1.25rem;
   --space-6: 1.5rem;
   --space-8: 2rem;
   --space-12: 3rem;
@@ -353,10 +351,6 @@ p {
   letter-spacing: -0.01em;
 }
 
-.defect-form__field--grow {
-  min-width: 0;
-}
-
 .defect-form__label {
   color: var(--color-ink-700);
   font-size: var(--text-xs);
@@ -582,11 +576,6 @@ p {
 .badge--muted {
   background: #f1f5f9;
   color: #475569;
-}
-
-.badge--success {
-  background: var(--color-success-bg);
-  color: var(--color-success-700);
 }
 
 /* ---------- 10. Адаптивность ---------- */

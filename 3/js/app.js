@@ -156,17 +156,26 @@
   }
 
   function updateSummary() {
-    const total = state.defects.length;
-    const open = state.defects.filter((defect) => defect.status !== "closed").length;
-    const closed = total - open;
-    const high = state.defects.filter(
-      (defect) => defect.priority === "high" && defect.status !== "closed"
-    ).length;
+    const summary = state.defects.reduce(
+      (result, defect) => {
+        result.total += 1;
 
-    ui.kpiTotal.textContent = String(total);
-    ui.kpiOpen.textContent = String(open);
-    ui.kpiClosed.textContent = String(closed);
-    ui.kpiHigh.textContent = String(high);
+        if (defect.status === "closed") {
+          result.closed += 1;
+        } else {
+          result.open += 1;
+          if (defect.priority === "high") result.high += 1;
+        }
+
+        return result;
+      },
+      { total: 0, open: 0, closed: 0, high: 0 }
+    );
+
+    ui.kpiTotal.textContent = String(summary.total);
+    ui.kpiOpen.textContent = String(summary.open);
+    ui.kpiClosed.textContent = String(summary.closed);
+    ui.kpiHigh.textContent = String(summary.high);
   }
 
   function updateFilterState() {
@@ -178,8 +187,7 @@
     });
   }
 
-  function render() {
-    const visibleDefects = getVisibleDefects();
+  function render(visibleDefects = getVisibleDefects()) {
     const hasVisibleDefects = visibleDefects.length > 0;
 
     ui.tableBody.replaceChildren(...visibleDefects.map(createRow));
@@ -233,9 +241,10 @@
     ui.form.reset();
     ui.priority.value = "medium";
 
-    const isVisible = getVisibleDefects().some((item) => item.id === defect.id);
+    const visibleDefects = getVisibleDefects();
+    const isVisible = visibleDefects.some((item) => item.id === defect.id);
 
-    render();
+    render(visibleDefects);
     setMessage(
       isVisible
         ? `Дефект ${defect.id} добавлен.`
