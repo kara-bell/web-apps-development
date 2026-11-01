@@ -48,6 +48,7 @@
     tableBody: document.querySelector("#defects-body"),
     tableWrap: document.querySelector("#defects-table"),
     emptyState: document.querySelector("#empty-state"),
+    defectsTitle: document.querySelector("#defects-title"),
     message: document.querySelector("#dashboard-message"),
     resetDemo: document.querySelector("#reset-demo"),
     resetFilters: document.querySelector("#reset-filters"),
@@ -267,6 +268,16 @@
     defect.status = "closed";
     render();
     setMessage(`Дефект ${defect.id} закрыт.`, "success");
+
+    const nextCloseButton = ui.tableBody.querySelector('[data-action="close"]');
+
+    if (nextCloseButton) {
+      nextCloseButton.focus();
+    } else if (!ui.emptyState.hidden) {
+      ui.resetFilters.focus();
+    } else {
+      ui.defectsTitle.focus();
+    }
   }
 
   function resetDemo() {
