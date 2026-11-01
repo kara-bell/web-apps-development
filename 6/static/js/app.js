@@ -8,6 +8,9 @@ const loadButton = document.querySelector("#load-json");
 const message = document.querySelector("#json-message");
 const runsContainer = document.querySelector("#runs-container");
 const runsBody = document.querySelector("#runs-body");
+const statusFilter = document.querySelector("#status-filter");
+const sortOrder = document.querySelector("#sort-order");
+const runsSummary = document.querySelector("#runs-summary");
 
 const wsStatus = document.querySelector("#ws-status");
 const wsStatusText = document.querySelector("#ws-status-text");
@@ -104,22 +107,84 @@ function createStatusCell(status) {
   return cell;
 }
 
-function renderRuns(runs) {
+let currentRuns = [];
+let runsLoaded = false;
+
+function renderRows(runs) {
   runsBody.replaceChildren();
 
-  for (const run of runs) {
+  if (runs.length === 0) {
     const row = document.createElement("tr");
-    row.append(
-      createCell(run.suite || "—"),
-      createStatusCell(run.status),
-      createCell(`${run.duration} с`),
-      createCell(run.author || "—"),
-      createCell(formatDate(run.startedAt)),
-    );
+    row.className = "table__empty";
+    const cell = document.createElement("td");
+    cell.colSpan = 5;
+    cell.textContent = runsLoaded
+      ? "Нет прогонов по выбранному фильтру."
+      : "";
+    row.append(cell);
     runsBody.append(row);
+  } else {
+    for (const run of runs) {
+      const row = document.createElement("tr");
+      row.append(
+        createCell(run.suite || "—"),
+        createStatusCell(run.status),
+        createCell(`${run.duration} с`),
+        createCell(run.author || "—"),
+        createCell(formatDate(run.startedAt)),
+      );
+      runsBody.append(row);
+    }
   }
 
-  runsContainer.hidden = runs.length === 0;
+  runsContainer.hidden = !runsLoaded;
+}
+
+function getVisibleRuns() {
+  const status = statusFilter.value;
+  const filtered =
+    status === "all"
+      ? [...currentRuns]
+      : currentRuns.filter((run) => run.status === status);
+
+  const order = sortOrder.value;
+  if (order === "duration-asc") {
+    filtered.sort((a, b) => Number(a.duration) - Number(b.duration));
+  } else if (order === "duration-desc") {
+    filtered.sort((a, b) => Number(b.duration) - Number(a.duration));
+  } else if (order === "suite") {
+    filtered.sort((a, b) =>
+      String(a.suite).localeCompare(String(b.suite), "ru"),
+    );
+  }
+
+  return filtered;
+}
+
+function updateRunsSummary(runs) {
+  const total = runs.reduce((sum, run) => sum + Number(run.duration), 0);
+  const average = runs.length
+    ? (total / runs.length).toFixed(1).replace(".0", "")
+    : "0";
+
+  runsSummary.textContent =
+    `Показано: ${runs.length} из ${currentRuns.length} · ` +
+    `Суммарная длительность: ${total} с · Средняя: ${average} с`;
+}
+
+function renderRunsView() {
+  const visibleRuns = getVisibleRuns();
+  renderRows(visibleRuns);
+  updateRunsSummary(visibleRuns);
+}
+
+function setRuns(runs) {
+  currentRuns = runs;
+  runsLoaded = true;
+  statusFilter.disabled = false;
+  sortOrder.disabled = false;
+  runsSummary.hidden = false;
+  renderRunsView();
 }
 
 // ============================================================
@@ -162,7 +227,7 @@ async function loadRuns() {
       throw new Error("Сервер вернул неверный формат данных");
     }
 
-    renderRuns(runs);
+    setRuns(runs);
     setMessage(
       `Загружено прогонов: ${runs.length}. Данные сервера синхронизированы с файлом. Файл: `,
       "success",
@@ -212,7 +277,7 @@ function applySnapshot(payload) {
     return;
   }
 
-  renderRuns(payload.runs);
+  setRuns(payload.runs);
 
   if (payload.serverTime) {
     wsUpdated.textContent = `Обновлено: ${formatTime(payload.serverTime)}`;
@@ -524,6 +589,9 @@ async function loadXml() {
 }
 
 loadXmlButton.addEventListener("click", loadXml);
+
+statusFilter.addEventListener("change", renderRunsView);
+sortOrder.addEventListener("change", renderRunsView);
 
 loadButton.addEventListener("click", loadRuns);
 

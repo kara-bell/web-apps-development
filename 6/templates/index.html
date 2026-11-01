@@ -41,6 +41,30 @@
         </button>
       </div>
 
+      <div class="runs-toolbar">
+        <label class="toolbar__field" for="status-filter">
+          Статус
+          <select id="status-filter" disabled>
+            <option value="all">Все</option>
+            <option value="passed">Пройден</option>
+            <option value="failed">Провален</option>
+            <option value="running">Выполняется</option>
+          </select>
+        </label>
+
+        <label class="toolbar__field" for="sort-order">
+          Сортировка
+          <select id="sort-order" disabled>
+            <option value="default">Как в файле</option>
+            <option value="duration-asc">Длительность ↑</option>
+            <option value="duration-desc">Длительность ↓</option>
+            <option value="suite">Набор тестов</option>
+          </select>
+        </label>
+      </div>
+
+      <p class="runs-summary" id="runs-summary" aria-live="polite" hidden></p>
+
       <div class="table-wrap" id="runs-container" hidden>
         <table class="table">
           <caption class="visually-hidden">Тестовые прогоны из JSON-файла</caption>

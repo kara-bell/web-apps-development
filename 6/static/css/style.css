@@ -259,6 +259,49 @@ h1 {
   margin-left: auto;
 }
 
+.runs-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: end;
+  margin-bottom: var(--space-3);
+}
+
+.toolbar__field {
+  display: grid;
+  gap: var(--space-1);
+  color: var(--color-ink-700);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.toolbar__field select {
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-ink-900);
+  font: inherit;
+  font-weight: 400;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+}
+
+.toolbar__field select:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.toolbar__field select:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.runs-summary {
+  margin: 0 0 var(--space-3);
+  color: var(--color-ink-500);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .switch {
   position: relative;
   display: inline-flex;
