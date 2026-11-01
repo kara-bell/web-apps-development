@@ -19,6 +19,7 @@ from flask import (
     Response,
     jsonify,
     render_template,
+    request,
     send_from_directory,
     stream_with_context,
 )
@@ -67,6 +68,21 @@ class RunStore:
         """Возвращает копию списка прогонов."""
         with self._lock:
             return [dict(run) for run in self._runs]
+
+    def add(self, suite: str, author: str, duration: int, status: str) -> dict:
+        """Добавляет прогон в память и возвращает созданную запись."""
+        with self._lock:
+            next_id = max((run["id"] for run in self._runs), default=0) + 1
+            run = {
+                "id": next_id,
+                "suite": suite,
+                "status": status,
+                "duration": duration,
+                "author": author,
+                "startedAt": datetime.now().isoformat(timespec="seconds"),
+            }
+            self._runs.append(run)
+            return dict(run)
 
     def tick(self) -> list[dict]:
         """Обновляет все выполняющиеся прогоны и возвращает изменённые записи."""
@@ -233,6 +249,66 @@ def sse_stream():
     response.headers["Cache-Control"] = "no-cache"
     response.headers["X-Accel-Buffering"] = "no"
     return response
+
+
+def validate_run(payload) -> str | None:
+    """Проверяет данные формы. Возвращает текст ошибки или None."""
+    if not isinstance(payload, dict):
+        return "Ожидается JSON-объект"
+
+    suite = payload.get("suite")
+    author = payload.get("author")
+    duration = payload.get("duration")
+    status = payload.get("status")
+
+    if not isinstance(suite, str) or not suite.strip():
+        return "Введите название набора тестов"
+    if len(suite.strip()) > 80:
+        return "Название набора слишком длинное"
+    if not isinstance(author, str) or not author.strip():
+        return "Введите автора"
+    if len(author.strip()) > 40:
+        return "Имя автора слишком длинное"
+    if (
+        not isinstance(duration, int)
+        or isinstance(duration, bool)
+        or duration < 0
+    ):
+        return "Длительность должна быть целым неотрицательным числом"
+    if status not in RUN_STATUSES:
+        return "Неизвестный статус"
+
+    return None
+
+
+@app.post("/api/runs")
+def create_run():
+    """Добавляет прогон в память и рассылает обновление по WS и SSE."""
+    payload = request.get_json(silent=True)
+    error = validate_run(payload)
+
+    if error:
+        return jsonify({"error": error}), 400
+
+    suite = payload["suite"].strip()
+    author = payload["author"].strip()
+    run = store.add(suite, author, payload["duration"], payload["status"])
+
+    snapshot = snapshot_message("run_added")
+    broadcast_ws(snapshot)
+    broadcast_sse(
+        "run",
+        {
+            "time": run["startedAt"],
+            "id": run["id"],
+            "suite": run["suite"],
+            "status": run["status"],
+            "duration": run["duration"],
+        },
+    )
+
+    snapshot["created"] = run
+    return jsonify(snapshot), 201
 
 
 @sock.route("/ws")

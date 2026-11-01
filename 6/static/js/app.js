@@ -32,6 +32,14 @@ const xmlPriority = document.querySelector("#xml-priority");
 const xmlChangePriority = document.querySelector("#xml-change-priority");
 const xmlResult = document.querySelector("#xml-result");
 
+const runForm = document.querySelector("#run-form");
+const suiteInput = document.querySelector("#suite");
+const authorInput = document.querySelector("#author");
+const durationInput = document.querySelector("#duration");
+const statusInput = document.querySelector("#status");
+const submitRunButton = document.querySelector("#submit-run");
+const formMessage = document.querySelector("#form-message");
+
 const JSON_URL = "/data/runs.json";
 const RELOAD_URL = "/api/runs/reload";
 const XML_URL = "/data/test-cases.xml";
@@ -702,6 +710,94 @@ async function loadXml() {
 }
 
 loadXmlButton.addEventListener("click", loadXml);
+
+// ============================================================
+// Пункт 8. Форма нового прогона и POST /api/runs
+// ============================================================
+
+function setFormMessage(text, state = "info") {
+  setMessageOn(formMessage, text, state);
+}
+
+function validateRunForm(suite, author, duration) {
+  if (!suite) {
+    return "Введите название набора тестов.";
+  }
+  if (!author) {
+    return "Введите автора.";
+  }
+  if (!Number.isInteger(duration) || duration < 0) {
+    return "Длительность должна быть целым неотрицательным числом.";
+  }
+  return null;
+}
+
+async function submitRun(event) {
+  event.preventDefault();
+
+  const suite = suiteInput.value.trim();
+  const author = authorInput.value.trim();
+  const durationRaw = durationInput.value.trim();
+  const duration = Number(durationRaw);
+  const status = statusInput.value;
+
+  if (!durationRaw) {
+    setFormMessage("Введите длительность.", "error");
+    return;
+  }
+
+  const validationError = validateRunForm(suite, author, duration);
+  if (validationError) {
+    setFormMessage(validationError, "error");
+    return;
+  }
+
+  submitRunButton.disabled = true;
+  submitRunButton.setAttribute("aria-busy", "true");
+  setFormMessage("Отправка…");
+
+  try {
+    const response = await fetch("/api/runs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ suite, author, duration, status }),
+    });
+
+    let payload = null;
+    try {
+      payload = await response.json();
+    } catch {
+      // Ответ без JSON — покажем код ошибки.
+    }
+
+    if (!response.ok) {
+      throw new Error(payload?.error || `HTTP ${response.status}`);
+    }
+
+    if (!payload || !Array.isArray(payload.runs)) {
+      throw new Error("Сервер вернул неверный формат данных");
+    }
+
+    setRuns(payload.runs);
+    setFormMessage(
+      `Прогон «${payload.created?.suite || suite}» добавлен.`,
+      "success",
+    );
+    runForm.reset();
+    suiteInput.focus();
+  } catch (error) {
+    console.error("Ошибка добавления прогона:", error);
+    setFormMessage(error.message || "Не удалось добавить прогон.", "error");
+  } finally {
+    submitRunButton.disabled = false;
+    submitRunButton.removeAttribute("aria-busy");
+  }
+}
+
+runForm.addEventListener("submit", submitRun);
 
 xmlFilter.addEventListener("change", renderXmlView);
 xmlCaseSelect.addEventListener("change", () => {

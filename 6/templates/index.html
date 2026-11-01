@@ -163,6 +163,48 @@
         </table>
       </div>
     </section>
+
+    <section class="panel" aria-labelledby="form-title">
+      <div class="panel__head">
+        <h2 class="panel__title" id="form-title">Новый прогон</h2>
+      </div>
+
+      <form class="run-form" id="run-form" novalidate>
+        <div class="run-form__grid">
+          <div class="field">
+            <label class="field__label" for="suite">Набор тестов</label>
+            <input class="field__input" id="suite" name="suite" type="text" maxlength="80" required
+              placeholder="Оформление заказа" autocomplete="off">
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="author">Автор</label>
+            <input class="field__input" id="author" name="author" type="text" maxlength="40" required
+              placeholder="Иванов" autocomplete="off">
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="duration">Длительность, с</label>
+            <input class="field__input" id="duration" name="duration" type="number" min="0" step="1" required
+              placeholder="42" inputmode="numeric">
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="status">Статус</label>
+            <select class="field__input" id="status" name="status" required>
+              <option value="running">Выполняется</option>
+              <option value="passed">Пройден</option>
+              <option value="failed">Провален</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form__actions">
+          <button class="button" type="submit" id="submit-run">Добавить прогон</button>
+          <p class="message" id="form-message" role="alert"></p>
+        </div>
+      </form>
+    </section>
   </main>
 
   <noscript>
