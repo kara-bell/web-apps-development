@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "suite": "Оформление заказа",
+    "status": "passed",
+    "duration": 42,
+    "author": "Иванов",
+    "startedAt": "2026-11-01T10:15:00"
+  },
+  {
+    "id": 2,
+    "suite": "Оплата картой",
+    "status": "failed",
+    "duration": 38,
+    "author": "Петрова",
+    "startedAt": "2026-11-01T10:20:00"
+  },
+  {
+    "id": 3,
+    "suite": "Личный кабинет",
+    "status": "passed",
+    "duration": 27,
+    "author": "Сидоров",
+    "startedAt": "2026-11-01T10:25:00"
+  },
+  {
+    "id": 4,
+    "suite": "Поиск по каталогу",
+    "status": "running",
+    "duration": 15,
+    "author": "Иванов",
+    "startedAt": "2026-11-01T10:30:00"
+  },
+  {
+    "id": 5,
+    "suite": "Корзина",
+    "status": "failed",
+    "duration": 61,
+    "author": "Петрова",
+    "startedAt": "2026-11-01T10:35:00"
+  },
+  {
+    "id": 6,
+    "suite": "Уведомления",
+    "status": "passed",
+    "duration": 19,
+    "author": "Сидоров",
+    "startedAt": "2026-11-01T10:40:00"
+  },
+  {
+    "id": 7,
+    "suite": "Авторизация",
+    "status": "running",
+    "duration": 8,
+    "author": "Иванов",
+    "startedAt": "2026-11-01T10:45:00"
+  },
+  {
+    "id": 8,
+    "suite": "История заказов",
+    "status": "passed",
+    "duration": 33,
+    "author": "Петрова",
+    "startedAt": "2026-11-01T10:50:00"
+  }
+]

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QualityHub · Монитор тестовых прогонов</title>
+  <meta name="description"
+    content="Учебный монитор тестовых прогонов: загрузка JSON и XML по AJAX, обновления по WebSocket и Server Sent Events.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</head>
+
+<body>
+  <main class="page">
+    <section class="panel" aria-labelledby="page-title">
+      <div class="panel__head">
+        <h1 class="panel__title" id="page-title">Монитор тестовых прогонов</h1>
+        <button class="button" type="button" id="load-json">Загрузить данные из JSON</button>
+      </div>
+
+      <p class="message" id="json-message" role="status" aria-live="polite"></p>
+
+      <div class="table-wrap" id="runs-container" hidden>
+        <table class="table">
+          <caption class="visually-hidden">Тестовые прогоны из JSON-файла</caption>
+          <thead>
+            <tr>
+              <th scope="col">Набор</th>
+              <th scope="col">Статус</th>
+              <th scope="col">Длительность</th>
+              <th scope="col">Автор</th>
+              <th scope="col">Запуск</th>
+            </tr>
+          </thead>
+          <tbody id="runs-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <noscript>
+    <p class="noscript">Для работы монитора нужен JavaScript.</p>
+  </noscript>
+</body>
+
+</html>

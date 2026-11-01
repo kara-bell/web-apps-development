@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-cases>
+  <case id="TC-101" priority="high" automated="true">
+    <title>Вход с корректной парой логин/пароль</title>
+    <suite>Авторизация</suite>
+    <owner>Иванов</owner>
+    <steps>4</steps>
+  </case>
+  <case id="TC-102" priority="high" automated="false">
+    <title>Блокировка после пяти неверных попыток</title>
+    <suite>Авторизация</suite>
+    <owner>Петрова</owner>
+    <steps>6</steps>
+  </case>
+  <case id="TC-103" priority="medium" automated="true">
+    <title>Сохранение товара в корзине между сессиями</title>
+    <suite>Корзина</suite>
+    <owner>Сидоров</owner>
+    <steps>5</steps>
+  </case>
+  <case id="TC-104" priority="high" automated="true">
+    <title>Оплата картой с 3-D Secure</title>
+    <suite>Оплата</suite>
+    <owner>Иванов</owner>
+    <steps>8</steps>
+  </case>
+  <case id="TC-105" priority="low" automated="false">
+    <title>Отображение подсказки в пустом поиске</title>
+    <suite>Поиск</suite>
+    <owner>Петрова</owner>
+    <steps>2</steps>
+  </case>
+  <case id="TC-106" priority="medium" automated="true">
+    <title>Фильтр заказов по статусу</title>
+    <suite>История заказов</suite>
+    <owner>Сидоров</owner>
+    <steps>4</steps>
+  </case>
+  <case id="TC-107" priority="high" automated="false">
+    <title>Отправка уведомления о готовности заказа</title>
+    <suite>Уведомления</suite>
+    <owner>Иванов</owner>
+    <steps>3</steps>
+  </case>
+</test-cases>
