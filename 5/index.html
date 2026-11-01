@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Кинотека</title>
+  <meta name="description" content="Учебная кинотека на JavaScript: коллекция фильмов, подбор по жанру, году и режиссёру.">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/app.js" defer></script>
+</head>
+
+<body>
+  <main class="page">
+    <section class="library" aria-labelledby="library-title">
+      <h1 class="library__title" id="library-title">Кинотека</h1>
+      <p class="library__lead">
+        Коллекция фильмов с возможностью добавления новых записей и подбора по жанру, году выпуска и режиссёру.
+      </p>
+
+      <section class="library__add" aria-labelledby="add-title">
+        <h2 class="library__subtitle" id="add-title">Добавить фильм</h2>
+        <form class="movie-form" id="add-movie-form" novalidate>
+          <div class="movie-form__fields">
+            <div class="field field--wide">
+              <label class="field__label" for="movie-title">Название</label>
+              <input class="field__input" id="movie-title" name="title" type="text"
+                placeholder="Дюна" autocomplete="off" required>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="movie-genre">Жанр</label>
+              <input class="field__input" id="movie-genre" name="genre" type="text"
+                placeholder="фантастика" autocomplete="off" required>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="movie-director">Режиссёр</label>
+              <input class="field__input" id="movie-director" name="director" type="text"
+                placeholder="Дени Вильнёв" autocomplete="off" required>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="movie-year">Год выпуска</label>
+              <input class="field__input" id="movie-year" name="year" type="number" min="1888" step="1"
+                inputmode="numeric" placeholder="2021" autocomplete="off" required>
+            </div>
+          </div>
+
+          <p class="form-message" id="form-message" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+
+          <div class="movie-form__footer">
+            <button class="button button--primary" type="submit">Добавить фильм</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="library__titles" aria-labelledby="titles-title">
+        <h2 class="library__subtitle" id="titles-title">Все названия по алфавиту</h2>
+        <ol class="title-list" id="title-list"></ol>
+      </section>
+    </section>
+  </main>
+
+  <noscript>
+    <p class="noscript">Для работы кинотеки нужен JavaScript.</p>
+  </noscript>
+</body>
+
+</html>
