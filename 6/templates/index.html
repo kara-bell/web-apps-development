@@ -22,8 +22,8 @@
       <p class="message" id="json-message" role="status" aria-live="polite"></p>
 
       <div class="ws-bar">
-        <span class="ws-status" id="ws-status" data-state="wait">
-          <span class="ws-status__dot" aria-hidden="true"></span>
+        <span class="stream-status" id="ws-status" data-state="wait">
+          <span class="stream-status__dot" aria-hidden="true"></span>
           <span id="ws-status-text" aria-live="polite">WS: подключение…</span>
         </span>
 
@@ -56,6 +56,24 @@
           <tbody id="runs-body"></tbody>
         </table>
       </div>
+    </section>
+
+    <section class="panel" aria-labelledby="events-title">
+      <div class="panel__head">
+        <div>
+          <h2 class="panel__title" id="events-title">Лента событий</h2>
+          <p class="panel__hint">Односторонние обновления от сервера по Server Sent Events.</p>
+        </div>
+
+        <span class="stream-status" id="sse-status" data-state="wait">
+          <span class="stream-status__dot" aria-hidden="true"></span>
+          <span id="sse-status-text" aria-live="polite">SSE: подключение…</span>
+        </span>
+      </div>
+
+      <ul class="events" id="events-list" aria-live="polite">
+        <li class="events__empty" id="events-empty">События появятся после подключения к серверу.</li>
+      </ul>
     </section>
   </main>
 

@@ -15,9 +15,14 @@ const wsUpdates = document.querySelector("#ws-updates");
 const wsUpdated = document.querySelector("#ws-updated");
 const wsRefresh = document.querySelector("#ws-refresh");
 
+const sseStatus = document.querySelector("#sse-status");
+const sseStatusText = document.querySelector("#sse-status-text");
+const eventsList = document.querySelector("#events-list");
+
 const JSON_URL = "/data/runs.json";
 const RELOAD_URL = "/api/runs/reload";
 const WS_URL = `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/ws`;
+const SSE_URL = "/api/events";
 
 const STATUS_LABELS = {
   passed: "Пройден",
@@ -267,6 +272,129 @@ wsUpdates.addEventListener("change", () => {
   }
 });
 
+// ============================================================
+// Пункт 4. Server Sent Events: лента событий
+// ============================================================
+
+let sseSource = null;
+let sseReconnectTimer = null;
+let firstSseConnection = true;
+
+function setSseState(state, text) {
+  sseStatus.dataset.state = state;
+  sseStatusText.textContent = text;
+}
+
+function appendEvent({ time, text, status }) {
+  const empty = eventsList.querySelector(".events__empty");
+  if (empty) {
+    empty.remove();
+  }
+
+  const item = document.createElement("li");
+  item.className = "event";
+
+  const timeEl = document.createElement("span");
+  timeEl.className = "event__time";
+  timeEl.textContent = time;
+  item.append(timeEl);
+
+  const textEl = document.createElement("span");
+  textEl.className = "event__text";
+  textEl.textContent = text;
+  item.append(textEl);
+
+  if (status) {
+    const badge = document.createElement("span");
+    badge.className = `badge badge--${status}`;
+    badge.textContent = STATUS_LABELS[status] || status;
+    item.append(badge);
+  }
+
+  eventsList.prepend(item);
+
+  while (eventsList.children.length > 30) {
+    eventsList.lastElementChild.remove();
+  }
+}
+
+function handleSseMessage(event) {
+  let payload;
+  try {
+    payload = JSON.parse(event.data);
+  } catch {
+    return;
+  }
+
+  if (event.type === "run") {
+    appendEvent({
+      time: formatTime(payload.time),
+      text: `${payload.suite} — ${payload.duration} с`,
+      status: payload.status,
+    });
+  } else if (event.type === "info") {
+    appendEvent({
+      time: formatTime(payload.time),
+      text: payload.message,
+    });
+  } else if (event.type === "hello") {
+    setSseState("on", "SSE: подключено");
+  }
+}
+
+function scheduleSseReconnect() {
+  if (sseReconnectTimer !== null) {
+    return;
+  }
+
+  sseReconnectTimer = window.setTimeout(() => {
+    sseReconnectTimer = null;
+    connectSse();
+  }, 3000);
+}
+
+function connectSse() {
+  if (sseSource) {
+    return;
+  }
+
+  setSseState(
+    "wait",
+    firstSseConnection ? "SSE: подключение…" : "SSE: переподключение…",
+  );
+  firstSseConnection = false;
+
+  let source;
+  try {
+    source = new EventSource(SSE_URL);
+  } catch (error) {
+    console.error("Не удалось создать EventSource:", error);
+    setSseState("off", "SSE: недоступен");
+    scheduleSseReconnect();
+    return;
+  }
+
+  sseSource = source;
+
+  source.addEventListener("open", () => {
+    setSseState("on", "SSE: подключено");
+  });
+
+  source.addEventListener("error", () => {
+    setSseState("wait", "SSE: переподключение…");
+    source.close();
+    if (sseSource === source) {
+      sseSource = null;
+    }
+    scheduleSseReconnect();
+  });
+
+  source.addEventListener("hello", handleSseMessage);
+  source.addEventListener("run", handleSseMessage);
+  source.addEventListener("info", handleSseMessage);
+}
+
 loadButton.addEventListener("click", loadRuns);
 
 connectWebSocket();
+connectSse();

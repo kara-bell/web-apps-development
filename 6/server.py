@@ -1,19 +1,28 @@
 """Сервер монитора тестовых прогонов.
 
 Данные о прогонах хранятся в памяти. Файл data/runs.json только читается
-и никогда не изменяется. WebSocket рассылает снимки данных клиентам.
+и никогда не изменяется. WebSocket рассылает снимки данных, SSE — ленту
+событий об изменениях.
 """
 
 from __future__ import annotations
 
 import json
+import queue
 import random
 import threading
 import time
 from datetime import datetime
 from pathlib import Path
 
-from flask import Flask, jsonify, render_template, send_from_directory
+from flask import (
+    Flask,
+    Response,
+    jsonify,
+    render_template,
+    send_from_directory,
+    stream_with_context,
+)
 from flask_sock import Sock
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -22,6 +31,7 @@ RUNS_JSON = DATA_DIR / "runs.json"
 
 TICK_INTERVAL = 5
 RUN_STATUSES = {"passed", "failed", "running"}
+SSE_KEEPALIVE_INTERVAL = 15
 
 app = Flask(__name__)
 app.json.ensure_ascii = False
@@ -59,8 +69,8 @@ class RunStore:
         with self._lock:
             return [dict(run) for run in self._runs]
 
-    def tick(self) -> bool:
-        """Имитирует изменение всех выполняющихся прогонов."""
+    def tick(self) -> list[dict]:
+        """Обновляет все выполняющиеся прогоны и возвращает изменённые записи."""
         with self._lock:
             running = [run for run in self._runs if run["status"] == "running"]
 
@@ -69,25 +79,30 @@ class RunStore:
                     (run for run in self._runs if run["status"] == "passed"), None
                 )
                 if candidate is None:
-                    return False
+                    return []
                 candidate["status"] = "running"
                 candidate["duration"] = 0
-                return True
+                return [dict(candidate)]
 
+            changed: list[dict] = []
             for run in running:
                 run["duration"] = int(run["duration"]) + random.randint(1, 5)
                 if run["duration"] >= 60:
                     run["status"] = "passed"
+                changed.append(dict(run))
 
-            return True
+            return changed
 
 
 store = RunStore(RUNS_JSON)
 store.load()
 
-clients: list[dict] = []
-clients_lock = threading.Lock()
-send_lock = threading.Lock()
+ws_clients: list[dict] = []
+ws_clients_lock = threading.Lock()
+ws_send_lock = threading.Lock()
+
+sse_clients: list[dict] = []
+sse_clients_lock = threading.Lock()
 
 
 def snapshot_message(reason: str) -> dict:
@@ -101,28 +116,76 @@ def snapshot_message(reason: str) -> dict:
 
 
 def send_json(client: dict, payload: dict) -> None:
-    """Отправляет JSON одному клиенту."""
+    """Отправляет JSON одному WebSocket-клиенту."""
     data = json.dumps(payload, ensure_ascii=False)
-    with send_lock:
+    with ws_send_lock:
         client["ws"].send(data)
 
 
-def remove_client(client: dict) -> None:
-    """Убирает клиента из реестра."""
-    with clients_lock:
-        clients[:] = [item for item in clients if item is not client]
+def remove_ws_client(client: dict) -> None:
+    """Убирает WebSocket-клиента из реестра."""
+    with ws_clients_lock:
+        ws_clients[:] = [item for item in ws_clients if item is not client]
 
 
-def broadcast(payload: dict) -> None:
-    """Рассылает снимок клиентам с включёнными онлайн-обновлениями."""
-    with clients_lock:
-        targets = [client for client in clients if client["updates"]]
+def broadcast_ws(payload: dict) -> None:
+    """Рассылает снимок WebSocket-клиентам с включёнными обновлениями."""
+    with ws_clients_lock:
+        targets = [client for client in ws_clients if client["updates"]]
 
     for client in targets:
         try:
             send_json(client, payload)
         except Exception:
-            remove_client(client)
+            remove_ws_client(client)
+
+
+def sse_event(event: str, payload: dict) -> str:
+    """Форматирует одно SSE-событие."""
+    data = json.dumps(payload, ensure_ascii=False)
+    return f"event: {event}\ndata: {data}\n\n"
+
+
+def remove_sse_client(client: dict) -> None:
+    """Убирает SSE-клиента из реестра."""
+    with sse_clients_lock:
+        sse_clients[:] = [item for item in sse_clients if item is not client]
+
+
+def broadcast_sse(event: str, payload: dict) -> None:
+    """Рассылает событие всем подключённым SSE-клиентам."""
+    with sse_clients_lock:
+        targets = list(sse_clients)
+
+    for client in targets:
+        try:
+            client["queue"].put_nowait({"event": event, "payload": payload})
+        except queue.Full:
+            pass
+
+
+def event_stream(client: dict):
+    """Генератор потока SSE для одного клиента."""
+    try:
+        yield "retry: 3000\n\n"
+        yield sse_event(
+            "hello",
+            {
+                "serverTime": datetime.now().isoformat(timespec="seconds"),
+                "message": "SSE подключён",
+            },
+        )
+
+        while True:
+            try:
+                item = client["queue"].get(timeout=SSE_KEEPALIVE_INTERVAL)
+            except queue.Empty:
+                yield ": ping\n\n"
+                continue
+
+            yield sse_event(item["event"], item["payload"])
+    finally:
+        remove_sse_client(client)
 
 
 @app.get("/")
@@ -147,16 +210,38 @@ def reload_runs():
         return jsonify({"error": "Не удалось прочитать data/runs.json"}), 500
 
     payload = snapshot_message("reload")
-    broadcast(payload)
+    broadcast_ws(payload)
+    broadcast_sse(
+        "info",
+        {
+            "time": datetime.now().isoformat(timespec="seconds"),
+            "message": "Данные перечитаны из файла",
+        },
+    )
     return jsonify(payload)
+
+
+@app.get("/api/events")
+def sse_stream():
+    """Односторонний поток событий Server Sent Events."""
+    client = {"queue": queue.Queue(maxsize=100)}
+    with sse_clients_lock:
+        sse_clients.append(client)
+
+    response = Response(
+        stream_with_context(event_stream(client)), mimetype="text/event-stream"
+    )
+    response.headers["Cache-Control"] = "no-cache"
+    response.headers["X-Accel-Buffering"] = "no"
+    return response
 
 
 @sock.route("/ws")
 def websocket(ws):
     """Двусторонний канал: запросы клиента и снимки данных."""
     client = {"ws": ws, "updates": True}
-    with clients_lock:
-        clients.append(client)
+    with ws_clients_lock:
+        ws_clients.append(client)
 
     try:
         while True:
@@ -179,7 +264,7 @@ def websocket(ws):
             if message_type == "refresh":
                 send_json(client, snapshot_message("refresh"))
             elif message_type == "updates":
-                with clients_lock:
+                with ws_clients_lock:
                     client["updates"] = bool(message.get("enabled"))
             else:
                 send_json(
@@ -188,7 +273,7 @@ def websocket(ws):
     except Exception:
         pass
     finally:
-        remove_client(client)
+        remove_ws_client(client)
 
 
 _ticker_started = False
@@ -199,8 +284,24 @@ def _ticker_loop(interval: int) -> None:
     while True:
         time.sleep(interval)
         try:
-            if store.tick():
-                broadcast(snapshot_message("tick"))
+            changed = store.tick()
+            if not changed:
+                continue
+
+            broadcast_ws(snapshot_message("tick"))
+
+            event_time = datetime.now().isoformat(timespec="seconds")
+            for run in changed:
+                broadcast_sse(
+                    "run",
+                    {
+                        "time": event_time,
+                        "id": run["id"],
+                        "suite": run["suite"],
+                        "status": run["status"],
+                        "duration": run["duration"],
+                    },
+                )
         except Exception:
             app.logger.exception("Ошибка фонового обновления прогонов")
 

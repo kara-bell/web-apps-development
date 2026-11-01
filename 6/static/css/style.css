@@ -90,6 +90,11 @@ h1 {
   margin-bottom: var(--space-4);
 }
 
+.panel__head > div {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
 .panel__title {
   font-size: 1.5rem;
   letter-spacing: -0.01em;
@@ -179,7 +184,7 @@ h1 {
   border-radius: var(--radius-md);
 }
 
-.ws-status {
+.stream-status {
   display: inline-flex;
   flex: none;
   gap: var(--space-2);
@@ -189,7 +194,7 @@ h1 {
   white-space: nowrap;
 }
 
-.ws-status__dot {
+.stream-status__dot {
   flex: none;
   width: 0.55rem;
   height: 0.55rem;
@@ -198,7 +203,7 @@ h1 {
   animation: ws-pulse 2s ease-in-out infinite;
 }
 
-.ws-status[data-state="wait"] .ws-status__dot {
+.stream-status[data-state="wait"] .stream-status__dot {
   animation-duration: 1.2s;
 }
 
@@ -215,16 +220,16 @@ h1 {
   }
 }
 
-.ws-status[data-state="on"] .ws-status__dot {
+.stream-status[data-state="on"] .stream-status__dot {
   background: #10b981;
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
 }
 
-.ws-status[data-state="wait"] .ws-status__dot {
+.stream-status[data-state="wait"] .stream-status__dot {
   background: #f59e0b;
 }
 
-.ws-status[data-state="off"] .ws-status__dot {
+.stream-status[data-state="off"] .stream-status__dot {
   background: #ef4444;
 }
 
@@ -298,9 +303,51 @@ h1 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ws-status__dot {
+  .stream-status__dot {
     animation: none;
   }
+}
+
+.events {
+  display: grid;
+  gap: var(--space-2);
+  max-height: 18rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.event,
+.events__empty {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: baseline;
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.9rem;
+  background: var(--color-bg-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.event__time {
+  color: var(--color-ink-500);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.event__text {
+  flex: 1 1 auto;
+}
+
+.event .badge {
+  margin-left: auto;
+}
+
+.events__empty {
+  color: var(--color-ink-500);
 }
 
 .table-wrap {
