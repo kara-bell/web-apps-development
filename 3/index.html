@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QualityHub — панель дефектов</title>
+  <meta name="description" content="Учебный прототип панели управления дефектами QualityHub.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="app" aria-labelledby="page-title">
+    <h1 class="visually-hidden" id="page-title">QualityHub — панель дефектов</h1>
+
+    <!-- Основа скопирована из задания 1: 1/index.html, #dashboard > div > div -->
+    <section class="dashboard" aria-label="Панель дефектов">
+      <div class="dashboard__top">
+        <span class="dashboard__brand">QualityHub</span>
+        <span class="dashboard__crumb">Проект «Онлайн-сервис»</span>
+        <button class="button button--secondary button--small dashboard__reset" id="reset-demo" type="button">
+          Сбросить
+        </button>
+      </div>
+
+      <div class="dashboard__kpis">
+        <div class="kpi">
+          <span class="kpi__label">Всего дефектов</span>
+          <span class="kpi__value" id="kpi-total">6</span>
+          <span class="kpi__delta">демо-набор</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi__label">Открыто</span>
+          <span class="kpi__value" id="kpi-open">5</span>
+          <span class="kpi__delta">открыты и в работе</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi__label">Закрыто</span>
+          <span class="kpi__value" id="kpi-closed">1</span>
+          <span class="kpi__delta kpi__delta--up">исправлено</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi__label">Высокий приоритет</span>
+          <span class="kpi__value" id="kpi-high">2</span>
+          <span class="kpi__delta kpi__delta--down">требуют внимания</span>
+        </div>
+      </div>
+
+      <div class="dashboard__chart">
+        <div class="chart" aria-hidden="true">
+          <div class="chart__head">
+            <p class="chart__title">Динамика дефектов</p>
+            <span class="chart__legend">закрыто за спринт</span>
+          </div>
+          <svg viewBox="0 0 640 240" role="presentation" focusable="false">
+            <defs>
+              <linearGradient id="dashboardChartArea" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#2563eb" stop-opacity="0.14"></stop>
+                <stop offset="1" stop-color="#2563eb" stop-opacity="0"></stop>
+              </linearGradient>
+            </defs>
+            <g stroke="#e2e8f0" stroke-width="1">
+              <line x1="0" y1="30" x2="640" y2="30"></line>
+              <line x1="0" y1="80" x2="640" y2="80"></line>
+              <line x1="0" y1="130" x2="640" y2="130"></line>
+              <line x1="0" y1="180" x2="640" y2="180"></line>
+              <line x1="0" y1="230" x2="640" y2="230"></line>
+            </g>
+            <path d="M0 200 L78 180 L156 190 L234 150 L312 160 L390 120 L468 132 L546 90 L620 100 L620 240 L0 240 Z" fill="url(#dashboardChartArea)"></path>
+            <polyline points="0,200 78,180 156,190 234,150 312,160 390,120 468,132 546,90 620,100" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+            <g fill="#ffffff" stroke="#2563eb" stroke-width="2.5">
+              <circle cx="234" cy="150" r="4"></circle>
+              <circle cx="390" cy="120" r="4"></circle>
+              <circle cx="546" cy="90" r="4"></circle>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <form class="defect-form" id="defect-form" aria-labelledby="defect-form-title" novalidate>
+        <h2 class="defect-form__title" id="defect-form-title">Регистрация нового дефекта</h2>
+
+        <div class="defect-form__field defect-form__field--grow">
+          <label class="defect-form__label" for="defect-title">Название дефекта</label>
+          <input
+            class="input"
+            id="defect-title"
+            name="title"
+            type="text"
+            maxlength="80"
+            placeholder="Например: не сохраняется фильтр"
+            required
+            aria-describedby="defect-form-hint dashboard-message"
+          >
+        </div>
+
+        <div class="defect-form__field">
+          <label class="defect-form__label" for="defect-priority">Приоритет</label>
+          <select class="input" id="defect-priority" name="priority">
+            <option value="high">Высокий</option>
+            <option value="medium" selected>Средний</option>
+            <option value="low">Низкий</option>
+          </select>
+        </div>
+
+        <button class="button" type="submit">Добавить</button>
+
+        <p class="defect-form__hint" id="defect-form-hint">
+          От 3 до 80 символов. Новый дефект получит статус «Открыт».
+        </p>
+      </form>
+
+      <p class="dashboard__message" id="dashboard-message" role="status" aria-live="polite"></p>
+
+      <div class="dashboard__defects">
+        <h2 class="defects-heading" id="defects-title">Дефекты проекта</h2>
+
+        <div class="dashboard__toolbar">
+          <div class="search">
+            <label class="visually-hidden" for="defect-search">Поиск по ID или названию дефекта</label>
+            <input
+              class="input search__input"
+              id="defect-search"
+              name="search"
+              type="search"
+              placeholder="Поиск по ID или названию"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="filters" role="group" aria-label="Фильтр по приоритету">
+            <button class="chip" type="button" data-priority="all" aria-pressed="true">Все</button>
+            <button class="chip" type="button" data-priority="high" aria-pressed="false">Высокий</button>
+            <button class="chip" type="button" data-priority="medium" aria-pressed="false">Средний</button>
+            <button class="chip" type="button" data-priority="low" aria-pressed="false">Низкий</button>
+          </div>
+        </div>
+
+        <div class="table-panel">
+          <div class="table-wrap" id="defects-table">
+            <table class="table" aria-labelledby="defects-title">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Дефект</th>
+                  <th scope="col">Приоритет</th>
+                  <th scope="col">Статус</th>
+                  <th scope="col">Действие</th>
+                </tr>
+              </thead>
+              <tbody id="defects-body">
+                <tr>
+                  <td>QH-142</td>
+                  <td>Ошибка фильтра отчётов</td>
+                  <td><span class="badge badge--danger">Высокий</span></td>
+                  <td><span class="status status--progress">В работе</span></td>
+                  <td><button class="button button--secondary button--small" type="button" data-action="close" data-id="QH-142">Закрыть</button></td>
+                </tr>
+                <tr>
+                  <td>QH-138</td>
+                  <td>Неверный расчёт покрытия</td>
+                  <td><span class="badge badge--danger">Высокий</span></td>
+                  <td><span class="status status--progress">В работе</span></td>
+                  <td><button class="button button--secondary button--small" type="button" data-action="close" data-id="QH-138">Закрыть</button></td>
+                </tr>
+                <tr>
+                  <td>QH-131</td>
+                  <td>Опечатка в экспорте CSV</td>
+                  <td><span class="badge badge--muted">Низкий</span></td>
+                  <td><span class="status status--open">Открыт</span></td>
+                  <td><button class="button button--secondary button--small" type="button" data-action="close" data-id="QH-131">Закрыть</button></td>
+                </tr>
+                <tr>
+                  <td>QH-127</td>
+                  <td>Медленная загрузка отчёта</td>
+                  <td><span class="badge badge--warning">Средний</span></td>
+                  <td><span class="status status--open">Открыт</span></td>
+                  <td><button class="button button--secondary button--small" type="button" data-action="close" data-id="QH-127">Закрыть</button></td>
+                </tr>
+                <tr>
+                  <td>QH-119</td>
+                  <td>Не сохраняется фильтр</td>
+                  <td><span class="badge badge--warning">Средний</span></td>
+                  <td><span class="status status--progress">В работе</span></td>
+                  <td><button class="button button--secondary button--small" type="button" data-action="close" data-id="QH-119">Закрыть</button></td>
+                </tr>
+                <tr class="row--closed">
+                  <td>QH-104</td>
+                  <td>Нет подсказки в поле даты</td>
+                  <td><span class="badge badge--muted">Низкий</span></td>
+                  <td><span class="status status--closed">Закрыт</span></td>
+                  <td><span class="table__dash" aria-label="Действия недоступны">—</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="empty-state" id="empty-state" hidden>
+            <p>Ничего не найдено. Измените запрос или сбросьте фильтры.</p>
+            <button class="button button--secondary" id="reset-filters" type="button">Сбросить фильтры</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
