@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import queue
-import random
 import threading
 import time
 from datetime import datetime
@@ -86,7 +85,7 @@ class RunStore:
 
             changed: list[dict] = []
             for run in running:
-                run["duration"] = int(run["duration"]) + random.randint(1, 5)
+                run["duration"] = int(run["duration"]) + TICK_INTERVAL
                 if run["duration"] >= 60:
                     run["status"] = "passed"
                 changed.append(dict(run))

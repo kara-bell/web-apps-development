@@ -68,6 +68,8 @@ h1 {
 }
 
 .page {
+  display: grid;
+  gap: var(--space-8);
   max-width: var(--container);
   margin: 0 auto;
   padding: var(--space-8) var(--space-4);
@@ -95,9 +97,20 @@ h1 {
   min-width: 0;
 }
 
+.panel__head--top {
+  align-items: flex-start;
+}
+
 .panel__title {
+  margin: 0;
   font-size: 1.5rem;
   letter-spacing: -0.01em;
+}
+
+.panel__hint {
+  margin: var(--space-1) 0 0;
+  color: var(--color-ink-500);
+  font-size: 0.9rem;
 }
 
 .button {
