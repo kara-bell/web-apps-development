@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QualityHub — канбан дефектов</title>
+  <meta name="description" content="Учебный канбан дефектов QualityHub с перетаскиванием карточек на SortableJS.">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="vendor/sortable.min.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <main class="app" aria-labelledby="page-title">
+    <header class="app__header">
+      <div class="app__heading">
+        <p class="app__brand">QualityHub</p>
+        <h1 class="app__title" id="page-title">Канбан дефектов</h1>
+      </div>
+
+      <div class="app__actions">
+        <p class="app__hint" id="board-hint">
+          Перетащите карточку в другую колонку, чтобы изменить статус дефекта.
+        </p>
+        <button class="button" id="reset-board" type="button">Сбросить</button>
+      </div>
+    </header>
+
+    <section class="summary" aria-label="Сводка по дефектам">
+      <article class="kpi">
+        <span class="kpi__label">Всего дефектов</span>
+        <strong class="kpi__value" id="kpi-total">12</strong>
+        <span class="kpi__note">в демонстрационном наборе</span>
+      </article>
+      <article class="kpi">
+        <span class="kpi__label">Открыто</span>
+        <strong class="kpi__value" id="kpi-open">9</strong>
+        <span class="kpi__note">новые, в работе, на проверке</span>
+      </article>
+      <article class="kpi">
+        <span class="kpi__label">Закрыто</span>
+        <strong class="kpi__value" id="kpi-closed">3</strong>
+        <span class="kpi__note">исправлено</span>
+      </article>
+      <button class="kpi kpi--filter" id="filter-high" type="button" aria-pressed="false">
+        <span class="kpi__label">Высокий приоритет</span>
+        <strong class="kpi__value" id="kpi-high">4</strong>
+        <span class="kpi__note" id="kpi-high-note">нажмите, чтобы отфильтровать</span>
+      </button>
+    </section>
+
+    <p class="filter-status" id="filter-status" hidden></p>
+
+    <section class="board" aria-label="Доска дефектов" aria-describedby="board-hint">
+      <section class="column" aria-labelledby="column-new">
+        <header class="column__header">
+          <h2 class="column__title" id="column-new">Новые</h2>
+          <span class="column__count" data-count="new" aria-label="3 дефекта">3</span>
+        </header>
+        <ul class="column__list" data-status="new" aria-label="Дефекты в колонке «Новые»"></ul>
+      </section>
+
+      <section class="column" aria-labelledby="column-in-progress">
+        <header class="column__header">
+          <h2 class="column__title" id="column-in-progress">В работе</h2>
+          <span class="column__count" data-count="in-progress" aria-label="3 дефекта">3</span>
+        </header>
+        <ul class="column__list" data-status="in-progress" aria-label="Дефекты в колонке «В работе»"></ul>
+      </section>
+
+      <section class="column" aria-labelledby="column-review">
+        <header class="column__header">
+          <h2 class="column__title" id="column-review">На проверке</h2>
+          <span class="column__count" data-count="review" aria-label="3 дефекта">3</span>
+        </header>
+        <ul class="column__list" data-status="review" aria-label="Дефекты в колонке «На проверке»"></ul>
+      </section>
+
+      <section class="column" aria-labelledby="column-closed">
+        <header class="column__header">
+          <h2 class="column__title" id="column-closed">Закрыто</h2>
+          <span class="column__count" data-count="closed" aria-label="3 дефекта">3</span>
+        </header>
+        <ul class="column__list" data-status="closed" aria-label="Дефекты в колонке «Закрыто»"></ul>
+      </section>
+    </section>
+
+    <p class="app__meta">Учебная демонстрация · SortableJS 1.15.7</p>
+    <p class="visually-hidden" id="live-region" aria-live="polite"></p>
+  </main>
+</body>
+</html>
