@@ -11,7 +11,15 @@ const app = express();
 const publicDir = path.join(__dirname, '..', 'public');
 const uploadsDir = path.join(__dirname, '..', 'uploads');
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        'img-src': ["'self'", 'data:', 'blob:'],
+      },
+    },
+  }),
+);
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 

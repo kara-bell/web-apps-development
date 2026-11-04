@@ -4,26 +4,307 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>QualityHub · Личный кабинет</title>
+    <meta
+      name="description"
+      content="Учебный личный кабинет тестировщика QualityHub: регистрация, вход, профиль и загрузка аватара."
+    />
     <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
     <header class="site-header">
       <a class="brand" href="/">Quality<span>Hub</span></a>
       <p class="brand-note">Личный кабинет тестировщика</p>
+      <span class="session-status" id="session-status">Гость</span>
     </header>
 
     <main class="page">
-      <section class="card" aria-labelledby="page-title">
-        <p class="eyebrow">Учебный проект · Node.js + Express + MongoDB</p>
-        <h1 id="page-title">Личный кабинет</h1>
-        <p class="lead">
-          Каркас приложения.
-        </p>
-        <p class="status" id="server-status" role="status" aria-live="polite">
-          Проверка сервера…
-        </p>
+      <section class="auth-layout" id="auth-view" aria-labelledby="auth-title">
+        <div class="card auth-actions">
+          <h1 id="auth-title">Личный кабинет</h1>
+          <div class="actions actions--pair">
+            <button type="button" class="button button--raised" id="open-login">
+              Вход
+            </button>
+            <button
+              type="button"
+              class="button button--raised button--ghost"
+              id="open-register"
+            >
+              Регистрация
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="profile-layout" id="profile-view" hidden aria-labelledby="profile-page-title">
+        <h1 class="page-title" id="profile-page-title">Профиль</h1>
+
+        <article class="card profile-card">
+          <div class="avatar avatar--large">
+            <img id="profile-avatar" alt="" hidden />
+            <span id="profile-initials" aria-hidden="true"></span>
+          </div>
+
+          <div class="profile-main">
+            <div class="profile-heading">
+              <h2 id="profile-title"></h2>
+              <p class="role-badge" id="profile-role"></p>
+            </div>
+
+            <dl class="profile-details">
+              <div>
+                <dt>E-mail</dt>
+                <dd id="profile-email"></dd>
+              </div>
+              <div>
+                <dt>Должность</dt>
+                <dd id="profile-position"></dd>
+              </div>
+              <div>
+                <dt>О себе</dt>
+                <dd id="profile-about"></dd>
+              </div>
+            </dl>
+
+            <div class="actions">
+              <button type="button" class="button button--raised" id="edit-button">
+                Редактировать
+              </button>
+              <button
+                type="button"
+                class="button button--raised button--ghost"
+                id="logout-button"
+              >
+                Выйти
+              </button>
+              <button
+                type="button"
+                class="button button--raised button--danger"
+                id="delete-button"
+              >
+                Удалить аккаунт
+              </button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="profile-layout" id="edit-view" hidden aria-labelledby="edit-title">
+        <article class="card edit-card">
+          <p class="eyebrow">Редактирование</p>
+          <h1 id="edit-title">Настройки профиля</h1>
+
+          <form id="edit-form">
+            <div class="edit-avatar">
+              <div class="avatar avatar--large">
+                <img id="edit-avatar" alt="Текущий аватар" hidden />
+                <span id="edit-initials" aria-hidden="true"></span>
+              </div>
+              <div class="field field--file">
+                <label for="edit-avatar-input">Новый аватар</label>
+                <input
+                  id="edit-avatar-input"
+                  name="avatar"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                />
+                <p class="hint">JPEG, PNG или WebP, не больше 2 МБ</p>
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <div class="field">
+                <label for="edit-name">Имя</label>
+                <input
+                  id="edit-name"
+                  name="name"
+                  type="text"
+                  minlength="2"
+                  maxlength="60"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label for="edit-role">Роль</label>
+                <select id="edit-role" name="role">
+                  <option value="tester">Тестировщик</option>
+                  <option value="analyst">Аналитик</option>
+                  <option value="manager">Менеджер</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="edit-position">Должность</label>
+              <input
+                id="edit-position"
+                name="position"
+                type="text"
+                maxlength="80"
+                placeholder="Например, QA-инженер"
+              />
+            </div>
+
+            <div class="field">
+              <label for="edit-about">О себе</label>
+              <textarea
+                id="edit-about"
+                name="about"
+                rows="4"
+                maxlength="300"
+                placeholder="Коротко о вашем опыте и специализации"
+              ></textarea>
+            </div>
+
+            <p class="form-message" data-form-message hidden></p>
+
+            <div class="actions">
+              <button type="submit" class="button">Сохранить</button>
+              <button type="button" class="button button--ghost" id="cancel-edit">
+                Отмена
+              </button>
+            </div>
+          </form>
+        </article>
       </section>
     </main>
+
+    <dialog class="dialog dialog--form" id="login-dialog" aria-labelledby="login-title">
+      <div class="dialog-header">
+        <h2 id="login-title">Вход</h2>
+        <button
+          type="button"
+          class="dialog-close"
+          data-close-dialog
+          aria-label="Закрыть окно входа"
+        >
+          ×
+        </button>
+      </div>
+
+      <form id="login-form">
+        <div class="field">
+          <label for="login-email">E-mail</label>
+          <input
+            id="login-email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            placeholder="name@example.com"
+            required
+          />
+        </div>
+        <div class="field">
+          <label for="login-password">Пароль</label>
+          <input
+            id="login-password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Ваш пароль"
+            required
+          />
+        </div>
+        <p class="form-message" data-form-message hidden></p>
+        <button type="submit" class="button">Войти</button>
+      </form>
+
+      <p class="dialog-switch">
+        Нет аккаунта?
+        <button type="button" class="link-button" id="switch-to-register">
+          Зарегистрироваться
+        </button>
+      </p>
+    </dialog>
+
+    <dialog class="dialog dialog--form" id="register-dialog" aria-labelledby="register-title">
+      <div class="dialog-header">
+        <h2 id="register-title">Регистрация</h2>
+        <button
+          type="button"
+          class="dialog-close"
+          data-close-dialog
+          aria-label="Закрыть окно регистрации"
+        >
+          ×
+        </button>
+      </div>
+
+      <form id="register-form">
+        <div class="field">
+          <label for="register-name">Имя</label>
+          <input
+            id="register-name"
+            name="name"
+            type="text"
+            autocomplete="name"
+            placeholder="Иван Петров"
+            minlength="2"
+            maxlength="60"
+            required
+          />
+        </div>
+        <div class="field">
+          <label for="register-email">E-mail</label>
+          <input
+            id="register-email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            placeholder="name@example.com"
+            required
+          />
+        </div>
+        <div class="field">
+          <label for="register-password">Пароль</label>
+          <input
+            id="register-password"
+            name="password"
+            type="password"
+            autocomplete="new-password"
+            placeholder="Не короче 8 символов"
+            minlength="8"
+            maxlength="72"
+            required
+          />
+        </div>
+        <div class="field">
+          <label for="register-role">Роль</label>
+          <select id="register-role" name="role">
+            <option value="tester">Тестировщик</option>
+            <option value="analyst">Аналитик</option>
+            <option value="manager">Менеджер</option>
+          </select>
+        </div>
+        <p class="form-message" data-form-message hidden></p>
+        <button type="submit" class="button">Создать аккаунт</button>
+      </form>
+
+      <p class="dialog-switch">
+        Уже есть аккаунт?
+        <button type="button" class="link-button" id="switch-to-login">
+          Войти
+        </button>
+      </p>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <dialog class="dialog" id="delete-dialog" aria-labelledby="delete-title">
+      <h2 id="delete-title">Удалить аккаунт?</h2>
+      <p>
+        Профиль и загруженный аватар будут удалены без возможности
+        восстановления.
+      </p>
+      <div class="actions">
+        <button type="button" class="button button--ghost" id="cancel-delete">
+          Отмена
+        </button>
+        <button type="button" class="button button--danger" id="confirm-delete">
+          Удалить
+        </button>
+      </div>
+    </dialog>
 
     <script type="module" src="/js/app.js"></script>
   </body>
