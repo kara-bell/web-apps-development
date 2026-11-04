@@ -9,7 +9,12 @@
     "dev": "node --watch server.js",
     "cleanup:test": "node scripts/cleanup-test-data.js",
     "seed:demo": "node scripts/seed-demo-data.js",
-    "smoke": "node scripts/smoke.js"
+    "smoke": "node scripts/smoke.js",
+    "test:e2e": "cypress run",
+    "test:e2e:open": "cypress open",
+    "test:e2e:chrome": "cypress run --browser chrome",
+    "test:e2e:edge": "cypress run --browser edge",
+    "test:e2e:firefox": "cypress run --browser firefox"
   },
   "engines": {
     "node": ">=20"
@@ -29,5 +34,8 @@
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.11.4"
+  },
+  "devDependencies": {
+    "cypress": "^16.2.1"
   }
 }

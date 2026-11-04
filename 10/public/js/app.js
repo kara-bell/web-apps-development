@@ -690,6 +690,15 @@
       });
     });
 
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      const openDialog = document.querySelector('dialog[open]');
+      if (openDialog) {
+        event.preventDefault();
+        openDialog.close();
+      }
+    });
+
     el.loginForm.addEventListener('submit', handleLogin);
     el.registerForm.addEventListener('submit', handleRegister);
     el.logoutBtn.addEventListener('click', handleLogout);

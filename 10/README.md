@@ -64,6 +64,18 @@ JWT_EXPIRES_IN=24h
 npm run smoke          # API smoke-тест, создаёт и удаляет временные данные
 npm run cleanup:test   # удаляет пользователей с e-mail, начинающимся на e2e_
 npm run seed:demo      # добавляет демонстрационных пользователей и тест-кейсы
+npm run test:e2e       # все автотесты Cypress
+npm run test:e2e:open  # интерактивный режим Cypress
+```
+
+Для Cypress приложение должно быть запущено на `http://localhost:3000`.
+
+Дополнительные браузеры:
+
+```powershell
+npm run test:e2e:chrome
+npm run test:e2e:edge
+npm run test:e2e:firefox
 ```
 
 ## Демонстрационные данные
@@ -118,6 +130,10 @@ $env:BASE_URL='http://127.0.0.1:3000'; npm run smoke
 │   ├── smoke.js
 │   ├── seed-demo-data.js
 │   └── cleanup-test-data.js
+├── cypress/
+│   ├── e2e/              # auth, test-cases, users, ui
+│   └── support/
+├── cypress.config.js
 └── docs/                 # документы тестирования, не коммитятся
 ```
 
