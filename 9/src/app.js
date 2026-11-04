@@ -2,6 +2,7 @@
 
 const path = require('node:path');
 const express = require('express');
+const testCasesRouter = require('./routes/testCases');
 const { notFound, errorHandler } = require('./middleware/errors');
 
 const app = express();
@@ -17,6 +18,8 @@ app.get('/api/health', (req, res) => {
     uptime: Math.round(process.uptime()),
   });
 });
+
+app.use('/api/test-cases', testCasesRouter);
 
 app.use('/api', notFound);
 app.use(notFound);
