@@ -3,6 +3,7 @@ node_modules/
 uploads/*
 !uploads/.gitkeep
 docs/
+scripts/
 npm-debug.log*
 *.log
 .DS_Store

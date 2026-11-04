@@ -80,6 +80,13 @@ export async function apiRequest(
   }
 
   if (!response.ok) {
+    if ([502, 503, 504].includes(response.status)) {
+      throw new ApiError(
+        response.status,
+        'Сервер недоступен. Попробуйте позже.',
+      );
+    }
+
     throw new ApiError(
       response.status,
       data && data.message ? data.message : 'Не удалось выполнить запрос',
