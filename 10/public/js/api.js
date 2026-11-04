@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const TOKEN_KEY = 'qualityhub10_token';
+  const CSRF_COOKIE = 'qualityhub10_csrf';
 
   class ApiError extends Error {
     constructor(message, status, fields) {
@@ -12,42 +12,26 @@
     }
   }
 
-  function getToken() {
-    return localStorage.getItem(TOKEN_KEY);
-  }
-
-  function setSessionCookie(token) {
-    document.cookie = `${TOKEN_KEY}=${encodeURIComponent(token)}; path=/; max-age=86400; samesite=lax`;
-  }
-
-  function clearSessionCookie() {
-    document.cookie = `${TOKEN_KEY}=; path=/; max-age=0; samesite=lax`;
-  }
-
-  function setToken(token) {
-    localStorage.setItem(TOKEN_KEY, token);
-    setSessionCookie(token);
-  }
-
-  function clearToken() {
-    localStorage.removeItem(TOKEN_KEY);
-    clearSessionCookie();
-  }
-
-  function syncSessionCookie() {
-    const token = getToken();
-    if (token) setSessionCookie(token);
+  function getCookie(name) {
+    const prefix = `${name}=`;
+    const entry = document.cookie
+      .split(';')
+      .map((part) => part.trim())
+      .find((part) => part.startsWith(prefix));
+    return entry ? decodeURIComponent(entry.slice(prefix.length)) : null;
   }
 
   async function request(path, options = {}) {
-    const { method = 'GET', body, auth = true } = options;
+    const { method = 'GET', body } = options;
     const headers = {};
 
-    if (auth && getToken()) {
-      headers.Authorization = `Bearer ${getToken()}`;
-    }
     if (body !== undefined) {
       headers['Content-Type'] = 'application/json';
+    }
+
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+      const csrfToken = getCookie(CSRF_COOKIE);
+      if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
     }
 
     let response;
@@ -55,6 +39,7 @@
       response = await fetch(path, {
         method,
         headers,
+        credentials: 'same-origin',
         body: body === undefined ? undefined : JSON.stringify(body)
       });
     } catch (error) {
@@ -83,11 +68,15 @@
   }
 
   function register(payload) {
-    return request('/api/auth/register', { method: 'POST', body: payload, auth: false });
+    return request('/api/auth/register', { method: 'POST', body: payload });
   }
 
   function login(payload) {
-    return request('/api/auth/login', { method: 'POST', body: payload, auth: false });
+    return request('/api/auth/login', { method: 'POST', body: payload });
+  }
+
+  function logout() {
+    return request('/api/auth/logout', { method: 'POST' });
   }
 
   function getMe() {
@@ -129,12 +118,9 @@
 
   window.QHApi = {
     ApiError,
-    getToken,
-    setToken,
-    clearToken,
-    syncSessionCookie,
     register,
     login,
+    logout,
     getMe,
     deleteAccount,
     listCases,

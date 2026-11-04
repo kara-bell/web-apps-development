@@ -94,14 +94,13 @@ describe('FS-01 / FS-02. Аутентификация и защита аккау
       });
     });
 
-    cy.visit('/', {
-      onBeforeLoad(win) {
-        win.localStorage.setItem('qualityhub10_token', 'invalid-token');
-      }
-    });
+    cy.clearCookies();
+    cy.setCookie('qualityhub10_token', 'invalid-token', { httpOnly: true, sameSite: 'lax' });
+    cy.setCookie('qualityhub10_csrf', 'e2e-csrf-token', { sameSite: 'lax' });
+    cy.visit('/');
     cy.get('#toast').should('contain', 'Сессия истекла');
     cy.get('#guest-view').should('be.visible');
-    cy.window().its('localStorage').invoke('getItem', 'qualityhub10_token').should('eq', null);
+    cy.getCookie('qualityhub10_token').should('be.null');
   });
 
   it('TC-06. Удаление аккаунта вместе с тест-кейсами', () => {

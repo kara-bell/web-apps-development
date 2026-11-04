@@ -68,8 +68,8 @@
     openDialog(el.userDialog);
   }
 
-  function redirectToLogin() {
-    api.clearToken();
+  async function redirectToLogin() {
+    await api.logout().catch(() => {});
     window.location.replace('/');
   }
 
@@ -139,14 +139,10 @@
   }
 
   async function init() {
-    if (!api.getToken()) {
-      redirectToLogin();
-      return;
-    }
+    localStorage.removeItem('qualityhub10_token');
 
     try {
       const data = await api.getMe();
-      api.syncSessionCookie();
       setSession(data.user);
       await loadUsers();
     } catch (error) {

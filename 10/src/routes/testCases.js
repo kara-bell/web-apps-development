@@ -2,11 +2,12 @@ const express = require('express');
 
 const testCaseService = require('../services/testCaseService');
 const authenticate = require('../middleware/auth');
+const csrfProtection = require('../middleware/csrf');
 const asyncHandler = require('../utils/asyncHandler');
 
 const router = express.Router();
 
-router.use(authenticate);
+router.use(authenticate, csrfProtection);
 
 router.get(
   '/stats',

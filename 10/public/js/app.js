@@ -244,8 +244,8 @@
     renderCases();
   }
 
-  function expireSession() {
-    api.clearToken();
+  async function expireSession() {
+    await api.logout().catch(() => {});
     setUser(null);
     showGuest();
     closeAllDialogs();
@@ -482,7 +482,6 @@
       setBusy(submit, false);
     }
 
-    api.setToken(result.token);
     setUser(result.user);
     el.loginForm.reset();
     el.loginDialog.close();
@@ -513,7 +512,6 @@
       setBusy(submit, false);
     }
 
-    api.setToken(result.token);
     setUser(result.user);
     el.registerForm.reset();
     el.registerDialog.close();
@@ -529,8 +527,8 @@
     openModal(el.profileDialog);
   }
 
-  function handleLogout() {
-    api.clearToken();
+  async function handleLogout() {
+    await api.logout().catch(() => {});
     setUser(null);
     showGuest();
     closeAllDialogs();
@@ -543,7 +541,6 @@
     setBusy(button, true, 'Удаление…');
     try {
       await api.deleteAccount();
-      api.clearToken();
       setUser(null);
       showGuest();
       closeAllDialogs();
@@ -805,25 +802,26 @@
   }
 
   async function restoreSession() {
-    if (!api.getToken()) {
-      setUser(null);
-      showGuest();
-      resetWorkspaceState();
-      return;
-    }
+    // Удаляем токен старых версий, где он хранился в localStorage.
+    localStorage.removeItem('qualityhub10_token');
 
     try {
       const data = await api.getMe();
-      api.syncSessionCookie();
       setUser(data.user);
       showWorkspace();
       await refresh();
     } catch (error) {
-      api.clearToken();
+      const hadSession = document.cookie.includes('qualityhub10_csrf=');
+      if (hadSession) {
+        await api.logout().catch(() => {});
+        toast('Сессия истекла. Войдите снова.', true);
+      } else if (error.status !== 401) {
+        toast(error.message, true);
+      }
+
       setUser(null);
       showGuest();
       resetWorkspaceState();
-      toast(error.status === 401 ? 'Сессия истекла. Войдите снова.' : error.message, true);
     }
   }
 

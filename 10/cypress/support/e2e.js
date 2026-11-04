@@ -1,4 +1,5 @@
 const TOKEN_KEY = 'qualityhub10_token';
+const CSRF_KEY = 'qualityhub10_csrf';
 const PASSWORD = 'Password123!';
 const cleanupTokens = [];
 
@@ -32,9 +33,8 @@ Cypress.Commands.add('trackToken', (token) => {
 });
 
 Cypress.Commands.add('trackCurrentToken', () => {
-  cy.window().then((win) => {
-    const token = win.localStorage.getItem(TOKEN_KEY);
-    if (token) cleanupTokens.push(token);
+  cy.getCookie(TOKEN_KEY).then((cookie) => {
+    if (cookie) cleanupTokens.push(cookie.value);
   });
 });
 
@@ -64,12 +64,9 @@ Cypress.Commands.add('createUser', (prefix = 'e2e_auto', options = {}) => {
 });
 
 Cypress.Commands.add('loginWithToken', (token, path = '/') => {
-  cy.visit(path, {
-    onBeforeLoad(win) {
-      win.localStorage.setItem(TOKEN_KEY, token);
-      win.document.cookie = `${TOKEN_KEY}=${encodeURIComponent(token)}; path=/; max-age=86400; samesite=lax`;
-    }
-  });
+  cy.setCookie(TOKEN_KEY, token, { httpOnly: true, sameSite: 'lax' });
+  cy.setCookie(CSRF_KEY, 'e2e-csrf-token', { sameSite: 'lax' });
+  cy.visit(path);
 });
 
 Cypress.Commands.add('visitAsGuest', (path = '/') => {
