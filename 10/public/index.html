@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QualityHub · Реестр тест-кейсов</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/api.js" defer></script>
+  <script src="/js/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">QualityHub</a>
+    <div class="topbar__right">
+      <a id="users-link" class="btn btn--ghost btn--small hidden" href="/users" data-testid="users-link">Пользователи</a>
+      <button id="session-label" class="session-label" type="button" disabled data-testid="session-label">Гость</button>
+      <button id="logout-btn" class="btn btn--ghost btn--small hidden" type="button" data-testid="logout-btn">Выйти</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section id="guest-view" class="guest" data-testid="guest-view">
+      <div class="guest__card">
+        <div class="guest__content">
+          <h1>Реестр тест-кейсов</h1>
+          <div class="guest__actions">
+            <button id="open-login" class="btn btn--primary" type="button" data-testid="open-login">Вход</button>
+            <button id="open-register" class="btn btn--secondary" type="button" data-testid="open-register">Регистрация</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="app-view" class="workspace hidden" data-testid="app-view">
+      <div class="workspace__head registry-hero">
+        <h1>Реестр тест-кейсов</h1>
+        <button id="open-create" class="btn btn--primary" type="button" data-testid="open-create">Добавить тест-кейс</button>
+      </div>
+
+      <section class="panel registry-panel" aria-label="Тест-кейсы">
+        <div class="filters" role="search">
+          <label class="field field--search">
+            <span>Поиск</span>
+            <input id="search" type="search" placeholder="Название, модуль или шаги" autocomplete="off" data-testid="search">
+          </label>
+          <label class="field">
+            <span>Приоритет</span>
+            <select id="priority-filter" data-testid="priority-filter">
+              <option value="">Все приоритеты</option>
+              <option value="high">Высокий</option>
+              <option value="medium">Средний</option>
+              <option value="low">Низкий</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Статус</span>
+            <select id="status-filter" data-testid="status-filter">
+              <option value="">Все статусы</option>
+              <option value="draft">Черновик</option>
+              <option value="in_progress">В работе</option>
+              <option value="ready">Готов</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="summary-badges" id="stats" role="group" aria-label="Сводка по тест-кейсам">
+          <button class="badge badge--total" type="button" data-stat="all" aria-pressed="false" data-testid="stat-all">
+            Всего: <strong id="stat-total">0</strong>
+          </button>
+          <button class="badge status-draft" type="button" data-stat="draft" aria-pressed="false" data-testid="stat-draft">
+            Черновики: <strong id="stat-draft">0</strong>
+          </button>
+          <button class="badge status-in_progress" type="button" data-stat="in_progress" aria-pressed="false" data-testid="stat-in-progress">
+            В работе: <strong id="stat-in-progress">0</strong>
+          </button>
+          <button class="badge status-ready" type="button" data-stat="ready" aria-pressed="false" data-testid="stat-ready">
+            Готов: <strong id="stat-ready">0</strong>
+          </button>
+          <button class="badge priority-high" type="button" data-stat="high" aria-pressed="false" data-testid="stat-high">
+            Высокий: <strong id="stat-high">0</strong>
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="cases-table">
+            <caption class="visually-hidden">Список тест-кейсов</caption>
+            <thead>
+              <tr>
+                <th scope="col">Тест-кейс</th>
+                <th scope="col">Модуль</th>
+                <th scope="col">Автор</th>
+                <th scope="col">Приоритет</th>
+                <th scope="col">Статус</th>
+                <th scope="col">Обновлён</th>
+                <th scope="col">Действия</th>
+              </tr>
+            </thead>
+            <tbody id="cases-body" data-testid="cases-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="login-dialog" class="modal" aria-labelledby="login-title">
+    <form id="login-form" class="modal__form" novalidate data-testid="login-form">
+      <div class="modal__head">
+        <h2 id="login-title">Вход</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Закрыть окно входа">×</button>
+      </div>
+      <p class="modal__text">Войдите, чтобы открыть свой реестр тест-кейсов.</p>
+      <p id="login-error" class="alert hidden" role="alert"></p>
+      <label class="field">
+        <span>E-mail</span>
+        <input name="email" type="email" autocomplete="email" required>
+      </label>
+      <label class="field">
+        <span>Пароль</span>
+        <input name="password" type="password" autocomplete="current-password" required>
+      </label>
+      <button class="btn btn--primary btn--full" type="submit">Войти</button>
+      <p class="modal__switch">Нет аккаунта? <button class="link" type="button" data-switch="register-dialog">Зарегистрироваться</button></p>
+    </form>
+  </dialog>
+
+  <dialog id="register-dialog" class="modal" aria-labelledby="register-title">
+    <form id="register-form" class="modal__form" novalidate data-testid="register-form">
+      <div class="modal__head">
+        <h2 id="register-title">Регистрация</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Закрыть окно регистрации">×</button>
+      </div>
+      <p class="modal__text">Создайте аккаунт, чтобы добавлять свои тест-кейсы.</p>
+      <p id="register-error" class="alert hidden" role="alert"></p>
+      <label class="field">
+        <span>Имя</span>
+        <input name="name" type="text" autocomplete="name" minlength="2" maxlength="60" required>
+      </label>
+      <label class="field">
+        <span>E-mail</span>
+        <input name="email" type="email" autocomplete="email" required>
+      </label>
+      <label class="field">
+        <span>Пароль</span>
+        <input name="password" type="password" autocomplete="new-password" minlength="8" maxlength="72" required>
+      </label>
+      <button class="btn btn--primary btn--full" type="submit">Создать аккаунт</button>
+      <p class="modal__switch">Уже есть аккаунт? <button class="link" type="button" data-switch="login-dialog">Войти</button></p>
+    </form>
+  </dialog>
+
+  <dialog id="profile-dialog" class="modal" aria-labelledby="profile-title" data-testid="profile-dialog">
+    <div class="modal__form">
+      <div class="modal__head">
+        <h2 id="profile-title">Профиль</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Закрыть профиль">×</button>
+      </div>
+      <dl class="profile">
+        <div>
+          <dt>Имя</dt>
+          <dd id="profile-name">—</dd>
+        </div>
+        <div>
+          <dt>E-mail</dt>
+          <dd id="profile-email">—</dd>
+        </div>
+      </dl>
+      <div class="modal__actions">
+        <button class="btn btn--danger" type="button" id="open-delete-account" data-testid="open-delete-account">Удалить аккаунт</button>
+        <button class="btn btn--ghost" type="button" data-close>Закрыть</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="case-dialog" class="modal modal--wide" aria-labelledby="case-dialog-title">
+    <form id="case-form" class="modal__form" novalidate data-testid="case-form">
+      <div class="modal__head">
+        <h2 id="case-dialog-title">Новый тест-кейс</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Закрыть окно тест-кейса">×</button>
+      </div>
+      <p id="case-error" class="alert hidden" role="alert"></p>
+      <p id="case-note" class="modal__text hidden"></p>
+      <div class="form-grid">
+        <label class="field">
+          <span>Название</span>
+          <input id="case-title" name="title" type="text" minlength="3" maxlength="120" required data-testid="case-title">
+        </label>
+        <label class="field">
+          <span>Модуль</span>
+          <input id="case-module" name="module" type="text" minlength="2" maxlength="60" required data-testid="case-module">
+        </label>
+        <label class="field">
+          <span>Приоритет</span>
+          <select id="case-priority" name="priority" required data-testid="case-priority">
+            <option value="high">Высокий</option>
+            <option value="medium" selected>Средний</option>
+            <option value="low">Низкий</option>
+          </select>
+        </label>
+      </div>
+      <label class="field">
+        <span>Шаги сценария</span>
+        <textarea id="case-steps" name="steps" rows="7" minlength="5" maxlength="2000" placeholder="Каждый шаг с новой строки" required data-testid="case-steps"></textarea>
+      </label>
+      <div class="modal__actions">
+        <button class="btn btn--ghost" type="button" data-close>Отмена</button>
+        <button id="case-submit" class="btn btn--primary" type="submit" data-testid="case-submit">Добавить тест-кейс</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="delete-dialog" class="modal" aria-labelledby="delete-title">
+    <div class="modal__form">
+      <div class="modal__head">
+        <h2 id="delete-title">Удалить тест-кейс?</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Закрыть окно удаления">×</button>
+      </div>
+      <p class="modal__text" id="delete-case-name"></p>
+      <div class="modal__actions">
+        <button class="btn btn--ghost" type="button" data-close>Отмена</button>
+        <button class="btn btn--danger" type="button" id="confirm-delete" data-testid="confirm-delete">Удалить</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="account-dialog" class="modal" aria-labelledby="account-title">
+    <div class="modal__form">
+      <div class="modal__head">
+        <h2 id="account-title">Удалить аккаунт?</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Закрыть окно удаления аккаунта">×</button>
+      </div>
+      <p class="modal__text">Аккаунт и все ваши тест-кейсы будут удалены безвозвратно.</p>
+      <div class="modal__actions">
+        <button class="btn btn--ghost" type="button" data-close>Отмена</button>
+        <button class="btn btn--danger" type="button" id="confirm-delete-account" data-testid="confirm-delete-account">Удалить аккаунт</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite" data-testid="toast"></div>
+</body>
+</html>

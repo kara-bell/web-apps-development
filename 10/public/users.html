@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QualityHub · Пользователи</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/api.js" defer></script>
+  <script src="/js/users.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">QualityHub</a>
+    <div class="topbar__right">
+      <a class="btn btn--ghost btn--small" href="/" data-testid="back-to-cases">К тест-кейсам</a>
+      <span id="session-label" class="session-label">Загрузка…</span>
+      <button id="logout-btn" class="btn btn--ghost btn--small hidden" type="button" data-testid="logout-btn">Выйти</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section id="users-view" class="workspace">
+      <div class="workspace__head">
+        <div>
+          <p class="eyebrow">QualityHub · сообщество</p>
+          <h1>Пользователи</h1>
+          <p id="users-count" class="muted">Загрузка списка…</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="cases-table users-table">
+          <thead>
+            <tr>
+              <th scope="col">Имя</th>
+              <th scope="col">E-mail</th>
+              <th scope="col">Зарегистрирован</th>
+              <th scope="col">Действия</th>
+            </tr>
+          </thead>
+          <tbody id="users-body" data-testid="users-body"></tbody>
+        </table>
+        <p id="empty-state" class="empty hidden" data-testid="empty-state">Пользователей пока нет.</p>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="user-dialog" class="modal" aria-labelledby="user-dialog-title" data-testid="user-dialog">
+    <div class="modal__form">
+      <div class="modal__head">
+        <h2 id="user-dialog-title">Профиль пользователя</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Закрыть профиль">×</button>
+      </div>
+      <dl class="profile">
+        <div>
+          <dt>Имя</dt>
+          <dd id="profile-name">—</dd>
+        </div>
+        <div>
+          <dt>E-mail</dt>
+          <dd id="profile-email">—</dd>
+        </div>
+        <div>
+          <dt>Зарегистрирован</dt>
+          <dd id="profile-created">—</dd>
+        </div>
+      </dl>
+      <div class="modal__actions">
+        <button class="btn btn--ghost" type="button" data-close>Закрыть</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite" data-testid="toast"></div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "name": "qualityhub-testcases",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Учебное приложение: личный реестр тест-кейсов на Node.js, Express и MongoDB",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "cleanup:test": "node scripts/cleanup-test-data.js",
+    "seed:demo": "node scripts/seed-demo-data.js",
+    "smoke": "node scripts/smoke.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "express",
+    "mongoose",
+    "jwt",
+    "test-cases",
+    "educational"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.11.4"
+  }
+}
