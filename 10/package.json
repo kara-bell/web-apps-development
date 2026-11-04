@@ -10,6 +10,8 @@
     "cleanup:test": "node scripts/cleanup-test-data.js",
     "seed:demo": "node scripts/seed-demo-data.js",
     "smoke": "node scripts/smoke.js",
+    "perf:api": "node scripts/perf-api.js",
+    "security:check": "node scripts/security-check.js",
     "test:e2e": "cypress run",
     "test:e2e:open": "cypress open",
     "test:e2e:chrome": "cypress run --browser chrome",
