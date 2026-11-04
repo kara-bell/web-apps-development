@@ -197,6 +197,7 @@ describe('FS-03 / FS-04. Реестр тест-кейсов', () => {
 
       cy.get('#search').type(data.moduleName);
       cy.get('#cases-body tr').should('have.length', 3);
+      cy.get('#result-count').should('contain', 'Показано: 3 из');
 
       cy.get('#search').clear().type('E2E Auto Alpha');
       cy.get('#cases-body tr').should('have.length', 1);
@@ -223,10 +224,12 @@ describe('FS-03 / FS-04. Реестр тест-кейсов', () => {
       }).then(({ body }) => {
         cy.get('#stats [data-stat="all"]').click();
         cy.get('#cases-body tr').should('have.length', body.items.length);
+        cy.get('#result-count').should('have.text', `Показано: ${body.items.length}`);
       });
 
       cy.get('#search').clear().type('zzzz');
       cy.get('#cases-body .empty').should('contain', 'Тест-кейсов пока нет.');
+      cy.get('#result-count').should('contain', 'Показано: 0 из');
     });
   });
 

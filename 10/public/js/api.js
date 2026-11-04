@@ -16,12 +16,27 @@
     return localStorage.getItem(TOKEN_KEY);
   }
 
+  function setSessionCookie(token) {
+    document.cookie = `${TOKEN_KEY}=${encodeURIComponent(token)}; path=/; max-age=86400; samesite=lax`;
+  }
+
+  function clearSessionCookie() {
+    document.cookie = `${TOKEN_KEY}=; path=/; max-age=0; samesite=lax`;
+  }
+
   function setToken(token) {
     localStorage.setItem(TOKEN_KEY, token);
+    setSessionCookie(token);
   }
 
   function clearToken() {
     localStorage.removeItem(TOKEN_KEY);
+    clearSessionCookie();
+  }
+
+  function syncSessionCookie() {
+    const token = getToken();
+    if (token) setSessionCookie(token);
   }
 
   async function request(path, options = {}) {
@@ -117,6 +132,7 @@
     getToken,
     setToken,
     clearToken,
+    syncSessionCookie,
     register,
     login,
     getMe,

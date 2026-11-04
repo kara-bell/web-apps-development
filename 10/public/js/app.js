@@ -48,6 +48,8 @@
     priorityFilter: $('priority-filter'),
     statusFilter: $('status-filter'),
     casesBody: $('cases-body'),
+    tableLoading: $('table-loading'),
+    resultCount: $('result-count'),
     stats: $('stats'),
     toast: $('toast')
   };
@@ -64,6 +66,7 @@
 
   let searchTimer = null;
   let toastTimer = null;
+  const mobileQuery = window.matchMedia('(max-width: 640px)');
 
   // ---------- Утилиты интерфейса ----------
 
@@ -110,19 +113,33 @@
   }
 
   function showFormError(element, error) {
-    const messages = new Set();
-    if (error.message && error.message !== 'Проверьте поля формы') {
-      messages.add(error.message);
-    }
-    if (error.fields) {
-      Object.values(error.fields).forEach((message) => messages.add(message));
-    }
-    element.textContent = messages.size ? Array.from(messages).join(' ') : 'Не удалось выполнить действие.';
+    const fieldMessages = error.fields ? Object.values(error.fields).filter(Boolean) : [];
+    const fallback = error.message || 'Не удалось выполнить действие.';
+    const useGeneralMessage = error.status === 409 && Boolean(error.message);
+    const messages = [
+      ...new Set(
+        useGeneralMessage
+          ? [error.message]
+          : fieldMessages.length > 0
+            ? fieldMessages
+            : [fallback]
+      )
+    ];
+    const list = document.createElement('ul');
+    list.className = 'alert__list';
+
+    messages.forEach((message) => {
+      const item = document.createElement('li');
+      item.textContent = message;
+      list.append(item);
+    });
+
+    element.replaceChildren(list);
     show(element);
   }
 
   function hideFormError(element) {
-    element.textContent = '';
+    element.replaceChildren();
     hide(element);
   }
 
@@ -170,18 +187,31 @@
 
   // ---------- Состояние экранов ----------
 
-  function setUser(user) {
-    state.user = user;
-    if (user) {
-      el.sessionLabel.textContent = `Вы вошли: ${user.name}`;
-      el.sessionLabel.disabled = false;
-      el.sessionLabel.title = 'Открыть профиль';
-      show(el.usersLink);
-      show(el.logoutBtn);
-    } else {
+  function updateSessionLabel() {
+    if (!state.user) {
       el.sessionLabel.textContent = 'Гость';
       el.sessionLabel.disabled = true;
       el.sessionLabel.title = '';
+      return;
+    }
+
+    el.sessionLabel.textContent = mobileQuery.matches
+      ? 'Профиль'
+      : `Вы вошли: ${state.user.name}`;
+    el.sessionLabel.disabled = false;
+    el.sessionLabel.title = 'Открыть профиль';
+  }
+
+  mobileQuery.addEventListener('change', updateSessionLabel);
+
+  function setUser(user) {
+    state.user = user;
+    updateSessionLabel();
+
+    if (user) {
+      show(el.usersLink);
+      show(el.logoutBtn);
+    } else {
       hide(el.usersLink);
       hide(el.logoutBtn);
     }
@@ -190,9 +220,8 @@
   function showGuest() {
     show(el.guestView);
     hide(el.appView);
-    el.sessionLabel.textContent = 'Гость';
-    el.sessionLabel.disabled = true;
-    el.sessionLabel.title = '';
+    state.user = null;
+    updateSessionLabel();
     hide(el.usersLink);
     hide(el.logoutBtn);
   }
@@ -227,9 +256,14 @@
   // ---------- Загрузка данных ----------
 
   async function loadCases() {
-    const data = await api.listCases(state.filters);
-    state.cases = Array.isArray(data.items) ? data.items : [];
-    renderCases();
+    show(el.tableLoading);
+    try {
+      const data = await api.listCases(state.filters);
+      state.cases = Array.isArray(data.items) ? data.items : [];
+      renderCases();
+    } finally {
+      hide(el.tableLoading);
+    }
   }
 
   async function loadStats() {
@@ -270,6 +304,16 @@
       button.classList.toggle('is-active', isActive);
       button.setAttribute('aria-pressed', String(isActive));
     });
+
+    updateResultCount();
+  }
+
+  function updateResultCount() {
+    if (!el.resultCount) return;
+    const shown = state.cases.length;
+    const total = state.stats ? state.stats.total : shown;
+    const filtered = Boolean(state.filters.search || state.filters.priority || state.filters.status);
+    el.resultCount.textContent = filtered ? `Показано: ${shown} из ${total}` : `Показано: ${total}`;
   }
 
   function makeBadge(label, modifier) {
@@ -295,6 +339,7 @@
     row.dataset.id = testCase._id;
 
     const titleCell = document.createElement('td');
+    titleCell.dataset.label = 'Тест-кейс';
     const titleWrap = document.createElement('div');
     titleWrap.className = 'case-title-cell';
 
@@ -321,25 +366,31 @@
     titleCell.append(titleWrap);
 
     const moduleCell = document.createElement('td');
+    moduleCell.dataset.label = 'Модуль';
     moduleCell.textContent = testCase.module;
 
     const authorCell = document.createElement('td');
+    authorCell.dataset.label = 'Автор';
     authorCell.textContent = own ? `${ownerNameOf(testCase)} (вы)` : ownerNameOf(testCase);
 
     const priorityCell = document.createElement('td');
+    priorityCell.dataset.label = 'Приоритет';
     priorityCell.append(
       makeBadge(PRIORITY_LABELS[testCase.priority] || testCase.priority, `priority-${testCase.priority}`)
     );
 
     const statusCell = document.createElement('td');
+    statusCell.dataset.label = 'Статус';
     statusCell.append(
       makeBadge(STATUS_LABELS[testCase.status] || testCase.status, `status-${testCase.status}`)
     );
 
     const dateCell = document.createElement('td');
+    dateCell.dataset.label = 'Обновлён';
     dateCell.textContent = formatDate(testCase.updatedAt);
 
     const actionsCell = document.createElement('td');
+    actionsCell.dataset.label = 'Действия';
     const actions = document.createElement('div');
     actions.className = 'actions-cell';
 
@@ -358,7 +409,7 @@
       actions.append(deleteButton);
     } else {
       const viewButton = makeActionButton('Просмотр', 'view', testCase._id, 'btn--ghost');
-      viewButton.setAttribute('aria-label', `Открыть тест-кейс «${testCase.title}»`);
+      viewButton.setAttribute('aria-label', `Просмотр тест-кейса «${testCase.title}»`);
       actions.append(viewButton);
     }
 
@@ -380,10 +431,12 @@
       cell.textContent = 'Тест-кейсов пока нет. Добавьте первый сценарий.';
       row.append(cell);
       el.casesBody.append(row);
+      updateResultCount();
       return;
     }
 
     state.cases.forEach((testCase) => el.casesBody.append(buildRow(testCase)));
+    updateResultCount();
   }
 
   // ---------- Фильтры ----------
@@ -761,6 +814,7 @@
 
     try {
       const data = await api.getMe();
+      api.syncSessionCookie();
       setUser(data.user);
       showWorkspace();
       await refresh();

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="QualityHub — учебный реестр тест-кейсов с личным кабинетом, поиском, фильтрами и разграничением прав.">
   <title>QualityHub · Реестр тест-кейсов</title>
   <link rel="stylesheet" href="/css/style.css">
   <script src="/js/api.js" defer></script>
@@ -81,6 +82,9 @@
           </button>
         </div>
 
+        <p id="result-count" class="result-count" aria-live="polite"></p>
+        <div id="table-loading" class="loading hidden" role="status">Загрузка тест-кейсов…</div>
+
         <div class="table-wrap">
           <table class="cases-table">
             <caption class="visually-hidden">Список тест-кейсов</caption>
@@ -109,7 +113,7 @@
         <button class="icon-btn" type="button" data-close aria-label="Закрыть окно входа">×</button>
       </div>
       <p class="modal__text">Войдите, чтобы открыть свой реестр тест-кейсов.</p>
-      <p id="login-error" class="alert hidden" role="alert"></p>
+      <div id="login-error" class="alert hidden" role="alert"></div>
       <label class="field">
         <span>E-mail</span>
         <input name="email" type="email" autocomplete="email" required>
@@ -130,7 +134,7 @@
         <button class="icon-btn" type="button" data-close aria-label="Закрыть окно регистрации">×</button>
       </div>
       <p class="modal__text">Создайте аккаунт, чтобы добавлять свои тест-кейсы.</p>
-      <p id="register-error" class="alert hidden" role="alert"></p>
+      <div id="register-error" class="alert hidden" role="alert"></div>
       <label class="field">
         <span>Имя</span>
         <input name="name" type="text" autocomplete="name" minlength="2" maxlength="60" required>
@@ -177,7 +181,7 @@
         <h2 id="case-dialog-title">Новый тест-кейс</h2>
         <button class="icon-btn" type="button" data-close aria-label="Закрыть окно тест-кейса">×</button>
       </div>
-      <p id="case-error" class="alert hidden" role="alert"></p>
+      <div id="case-error" class="alert hidden" role="alert"></div>
       <p id="case-note" class="modal__text hidden"></p>
       <div class="form-grid">
         <label class="field">

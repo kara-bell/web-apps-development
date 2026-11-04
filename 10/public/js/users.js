@@ -23,6 +23,7 @@
   };
 
   let toastTimer = null;
+  const mobileQuery = window.matchMedia('(max-width: 640px)');
 
   function toast(message, isError = false) {
     clearTimeout(toastTimer);
@@ -42,10 +43,29 @@
     }).format(date);
   }
 
+  function updateSessionLabel() {
+    if (!state.currentUser) return;
+    el.sessionLabel.textContent = mobileQuery.matches
+      ? 'Профиль'
+      : `Вы вошли: ${state.currentUser.name}`;
+    el.sessionLabel.disabled = false;
+    el.sessionLabel.title = 'Открыть профиль';
+  }
+
+  mobileQuery.addEventListener('change', updateSessionLabel);
+
   function setSession(user) {
     state.currentUser = user;
-    el.sessionLabel.textContent = `Вы вошли: ${user.name}`;
+    updateSessionLabel();
     el.logoutBtn.classList.remove('hidden');
+  }
+
+  function openCurrentProfile() {
+    if (!state.currentUser) return;
+    el.profileName.textContent = state.currentUser.name;
+    el.profileEmail.textContent = state.currentUser.email;
+    el.profileCreated.textContent = formatDate(state.currentUser.createdAt);
+    openDialog(el.userDialog);
   }
 
   function redirectToLogin() {
@@ -66,16 +86,20 @@
       const row = document.createElement('tr');
 
       const nameCell = document.createElement('td');
+      nameCell.dataset.label = 'Имя';
       const isMe = state.currentUser && user._id === state.currentUser._id;
       nameCell.textContent = isMe ? `${user.name} (вы)` : user.name;
 
       const emailCell = document.createElement('td');
+      emailCell.dataset.label = 'E-mail';
       emailCell.textContent = user.email;
 
       const dateCell = document.createElement('td');
+      dateCell.dataset.label = 'Зарегистрирован';
       dateCell.textContent = formatDate(user.createdAt);
 
       const actionsCell = document.createElement('td');
+      actionsCell.dataset.label = 'Действия';
       const actions = document.createElement('div');
       actions.className = 'actions';
 
@@ -85,7 +109,7 @@
       viewButton.textContent = 'Профиль';
       viewButton.dataset.action = 'view';
       viewButton.dataset.id = user._id;
-      viewButton.setAttribute('aria-label', `Открыть профиль пользователя ${user.name}`);
+      viewButton.setAttribute('aria-label', `Профиль пользователя ${user.name}`);
 
       actions.append(viewButton);
       actionsCell.append(actions);
@@ -122,6 +146,7 @@
 
     try {
       const data = await api.getMe();
+      api.syncSessionCookie();
       setSession(data.user);
       await loadUsers();
     } catch (error) {
@@ -135,6 +160,7 @@
   }
 
   el.logoutBtn.addEventListener('click', redirectToLogin);
+  el.sessionLabel.addEventListener('click', openCurrentProfile);
 
   document.querySelectorAll('[data-close]').forEach((button) => {
     button.addEventListener('click', () => {

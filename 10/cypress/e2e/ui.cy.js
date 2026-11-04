@@ -26,7 +26,41 @@ describe('UI. Модальные окна и адаптивность', () => {
           const documentElement = win.document.documentElement;
           expect(documentElement.scrollWidth).to.be.at.most(width + 1);
         });
+
+        if (width === 360) {
+          cy.get('.registry-panel .table-wrap').then(($element) => {
+            expect($element[0].scrollWidth).to.be.at.most($element[0].clientWidth + 1);
+          });
+          cy.get('#cases-body button[data-action]').first().should('be.visible');
+        }
       });
+    });
+  });
+
+  it('TC-19. На мобильном профиль доступен по короткой подписи', () => {
+    cy.createUser('e2e_mobile_profile', { name: 'E2E Mobile' }).then((account) => {
+      cy.loginWithToken(account.token);
+      cy.viewport(360, 800);
+      cy.get('#session-label').should('have.text', 'Профиль').and('not.be.disabled').click();
+      cy.get('#profile-dialog').should('be.visible');
+      cy.get('#profile-name').should('have.text', account.name);
+      cy.get('#profile-dialog .icon-btn').type('{esc}');
+      cy.get('#profile-dialog').should('not.have.attr', 'open');
+    });
+  });
+
+  it('TC-20. При загрузке списка показывается индикатор', () => {
+    cy.createUser('e2e_loading', { name: 'E2E Loading' }).then((account) => {
+      cy.intercept('GET', '/api/test-cases*', (req) => {
+        req.on('response', (res) => {
+          res.setDelay(700);
+        });
+      }).as('cases');
+
+      cy.loginWithToken(account.token);
+      cy.get('#table-loading').should('be.visible');
+      cy.wait('@cases');
+      cy.get('#table-loading').should('not.be.visible');
     });
   });
 });

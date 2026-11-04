@@ -67,11 +67,13 @@ Cypress.Commands.add('loginWithToken', (token, path = '/') => {
   cy.visit(path, {
     onBeforeLoad(win) {
       win.localStorage.setItem(TOKEN_KEY, token);
+      win.document.cookie = `${TOKEN_KEY}=${encodeURIComponent(token)}; path=/; max-age=86400; samesite=lax`;
     }
   });
 });
 
 Cypress.Commands.add('visitAsGuest', (path = '/') => {
+  cy.clearCookies();
   cy.visit(path, {
     onBeforeLoad(win) {
       win.localStorage.clear();

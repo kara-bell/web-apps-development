@@ -14,6 +14,11 @@ describe('FS-05. Пользователи и профили', () => {
       cy.get('#users-body tr').first().then(($row) => {
         expect($row.text()).to.match(/\d{2}\.\d{2}\.\d{4}/);
       });
+
+      cy.get('#session-label').should('not.be.disabled').click();
+      cy.get('#user-dialog').should('be.visible');
+      cy.get('#profile-email').should('have.text', account.email);
+      cy.get('#user-dialog [data-close]').first().click();
     });
   });
 
@@ -40,6 +45,14 @@ describe('FS-05. Пользователи и профили', () => {
   });
 
   it('TC-15. Гость не видит страницу пользователей', () => {
+    cy.request({
+      url: '/users',
+      followRedirect: false,
+      failOnStatusCode: false
+    })
+      .its('status')
+      .should('eq', 302);
+
     cy.visitAsGuest('/users');
     cy.location('pathname').should('eq', '/');
     cy.get('#guest-view').should('be.visible');

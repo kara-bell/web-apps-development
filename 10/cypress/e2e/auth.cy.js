@@ -27,6 +27,7 @@ describe('FS-01 / FS-02. Аутентификация и защита аккау
     cy.get('#register-form [name="password"]').type('Password123!');
     cy.get('#register-form button[type="submit"]').click();
     cy.get('#register-error').should('contain', 'уже зарегистрирован');
+    cy.get('#register-error li').should('have.length', 1);
 
     cy.get('#register-form [name="name"]').clear();
     cy.get('#register-form [name="email"]').clear();
@@ -36,6 +37,7 @@ describe('FS-01 / FS-02. Аутентификация и защита аккау
       .should('contain', 'Имя должно содержать')
       .and('contain', 'Укажите корректный e-mail')
       .and('contain', 'Пароль должен содержать');
+    cy.get('#register-error li').should('have.length', 3);
   });
 
   it('TC-03. Выход, неверный и корректный вход', () => {
@@ -59,11 +61,15 @@ describe('FS-01 / FS-02. Аутентификация и защита аккау
     cy.get('#guest-view').should('be.visible');
     cy.get('#app-view').should('have.class', 'hidden');
 
-    cy.visit('/users', {
-      onBeforeLoad(win) {
-        win.localStorage.clear();
-      }
-    });
+    cy.request({
+      url: '/users',
+      followRedirect: false,
+      failOnStatusCode: false
+    })
+      .its('status')
+      .should('eq', 302);
+
+    cy.visitAsGuest('/users');
     cy.location('pathname').should('eq', '/');
     cy.get('#guest-view').should('be.visible');
 

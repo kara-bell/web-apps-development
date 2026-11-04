@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="QualityHub — список пользователей и просмотр профилей в режиме только для чтения.">
   <title>QualityHub · Пользователи</title>
   <link rel="stylesheet" href="/css/style.css">
   <script src="/js/api.js" defer></script>
@@ -13,7 +14,7 @@
     <a class="brand" href="/">QualityHub</a>
     <div class="topbar__right">
       <a class="btn btn--ghost btn--small" href="/" data-testid="back-to-cases">К тест-кейсам</a>
-      <span id="session-label" class="session-label">Загрузка…</span>
+      <button id="session-label" class="session-label" type="button" disabled data-testid="session-label">Загрузка…</button>
       <button id="logout-btn" class="btn btn--ghost btn--small hidden" type="button" data-testid="logout-btn">Выйти</button>
     </div>
   </header>
@@ -28,7 +29,7 @@
         </div>
       </div>
 
-      <div class="table-wrap">
+      <div class="table-wrap users-table-wrap">
         <table class="cases-table users-table">
           <thead>
             <tr>
