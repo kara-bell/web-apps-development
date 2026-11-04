@@ -7,7 +7,17 @@
 const path = require('node:path');
 const fs = require('node:fs/promises');
 
-const DATA_FILE = path.join(__dirname, '..', '..', 'data', 'test-cases.json');
+const DATA_DIR = path.join(__dirname, '..', '..', 'data');
+const DATA_FILE = path.join(DATA_DIR, 'test-cases.json');
+
+async function writeAll(items) {
+  if (!Array.isArray(items)) {
+    throw new Error('Файл данных должен содержать массив тест-кейсов');
+  }
+
+  await fs.mkdir(DATA_DIR, { recursive: true });
+  await fs.writeFile(DATA_FILE, `${JSON.stringify(items, null, 2)}\n`, 'utf8');
+}
 
 async function readAll() {
   try {
@@ -34,15 +44,36 @@ async function findById(id) {
 }
 
 async function insert(item) {
-  throw new Error('insert будет реализован на этапе 5');
+  const items = await readAll();
+  items.push(item);
+  await writeAll(items);
+  return item;
 }
 
 async function update(id, changes) {
-  throw new Error('update будет реализован на этапе 5');
+  const items = await readAll();
+  const index = items.findIndex((item) => item.id === id);
+
+  if (index === -1) {
+    return null;
+  }
+
+  items[index] = { ...items[index], ...changes };
+  await writeAll(items);
+  return items[index];
 }
 
 async function remove(id) {
-  throw new Error('remove будет реализован на этапе 5');
+  const items = await readAll();
+  const index = items.findIndex((item) => item.id === id);
+
+  if (index === -1) {
+    return false;
+  }
+
+  items.splice(index, 1);
+  await writeAll(items);
+  return true;
 }
 
 module.exports = {
