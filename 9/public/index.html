@@ -1,24 +1,255 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>QualityHub · Реестр тест-кейсов</title>
-    <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="/css/style.css">
+    <meta
+      name="description"
+      content="Учебный реестр тест-кейсов QualityHub: добавление, поиск, фильтрация и изменение статусов."
+    />
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
-    <main class="shell">
-      <p class="brand">QualityHub</p>
-      <h1>Реестр тест-кейсов</h1>
-      <p class="lead">
-        Каркас серверного приложения запущен. Интерфейс реестра будет добавлен
-        на этапе создания одностраничного клиента.
-      </p>
-      <p>
-        Проверка сервера:
-        <a href="/api/health">/api/health</a>
-      </p>
+    <header class="site-header">
+      <a class="brand" href="/">Quality<span>Hub</span></a>
+    </header>
+
+    <main class="page">
+      <section class="hero" aria-labelledby="page-title">
+        <h1 id="page-title">Реестр тест-кейсов</h1>
+        <button type="button" class="button" id="open-create">
+          Добавить тест-кейс
+        </button>
+      </section>
+
+      <div class="message" id="message" role="status" aria-live="polite" hidden></div>
+
+      <section class="panel" aria-label="Тест-кейсы">
+        <div class="filters" role="search">
+          <label class="field field--search" for="search">
+            <span>Поиск</span>
+            <input
+              id="search"
+              name="search"
+              type="search"
+              placeholder="Название, модуль или шаги"
+              autocomplete="off"
+            />
+          </label>
+          <label class="field" for="priority-filter">
+            <span>Приоритет</span>
+            <select id="priority-filter">
+              <option value="">Все приоритеты</option>
+              <option value="high">Высокий</option>
+              <option value="medium">Средний</option>
+              <option value="low">Низкий</option>
+            </select>
+          </label>
+          <label class="field" for="status-filter">
+            <span>Статус</span>
+            <select id="status-filter">
+              <option value="">Все статусы</option>
+              <option value="draft">Черновик</option>
+              <option value="in_progress">В работе</option>
+              <option value="ready">Готов</option>
+            </select>
+          </label>
+        </div>
+
+        <div
+          class="summary-badges"
+          role="group"
+          aria-label="Сводка по тест-кейсам"
+        >
+          <button
+            type="button"
+            class="badge badge--total"
+            data-filter-type="all"
+            data-filter-value=""
+            aria-pressed="false"
+          >
+            Всего: <strong id="stat-total">0</strong>
+          </button>
+          <button
+            type="button"
+            class="badge status-draft"
+            data-filter-type="status"
+            data-filter-value="draft"
+            aria-pressed="false"
+          >
+            Черновики: <strong id="stat-draft">0</strong>
+          </button>
+          <button
+            type="button"
+            class="badge status-in_progress"
+            data-filter-type="status"
+            data-filter-value="in_progress"
+            aria-pressed="false"
+          >
+            В работе: <strong id="stat-progress">0</strong>
+          </button>
+          <button
+            type="button"
+            class="badge status-ready"
+            data-filter-type="status"
+            data-filter-value="ready"
+            aria-pressed="false"
+          >
+            Готов: <strong id="stat-ready">0</strong>
+          </button>
+          <button
+            type="button"
+            class="badge priority-high"
+            data-filter-type="priority"
+            data-filter-value="high"
+            aria-pressed="false"
+          >
+            Высокий: <strong id="stat-high">0</strong>
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="cases-table">
+            <caption class="visually-hidden">Список тест-кейсов</caption>
+            <thead>
+              <tr>
+                <th scope="col">Тест-кейс</th>
+                <th scope="col">Модуль</th>
+                <th scope="col">Приоритет</th>
+                <th scope="col">Статус</th>
+                <th scope="col">Обновлён</th>
+                <th scope="col">Действия</th>
+              </tr>
+            </thead>
+            <tbody id="cases-body"></tbody>
+          </table>
+        </div>
+      </section>
+
     </main>
+
+    <dialog class="dialog" id="create-dialog" aria-labelledby="create-title">
+      <div class="dialog-header">
+        <h2 id="create-title">Добавить тест-кейс</h2>
+        <button
+          type="button"
+          class="dialog-close"
+          id="close-create"
+          aria-label="Закрыть окно"
+        >
+          ×
+        </button>
+      </div>
+
+      <form id="create-form" class="create-form">
+        <div class="form-grid">
+          <label class="field">
+            <span>Название</span>
+            <input
+              name="title"
+              type="text"
+              placeholder="Например, Вход с корректным паролем"
+              minlength="3"
+              maxlength="120"
+              required
+            />
+          </label>
+          <label class="field">
+            <span>Модуль</span>
+            <input
+              name="module"
+              type="text"
+              placeholder="Например, Аутентификация"
+              minlength="2"
+              maxlength="60"
+              required
+            />
+          </label>
+          <label class="field">
+            <span>Приоритет</span>
+            <select name="priority">
+              <option value="medium" selected>Средний</option>
+              <option value="high">Высокий</option>
+              <option value="low">Низкий</option>
+            </select>
+          </label>
+          <label class="field field--full">
+            <span>Шаги сценария</span>
+            <textarea
+              name="steps"
+              rows="6"
+              placeholder="1. Открыть страницу входа.&#10;2. Ввести корректные данные.&#10;3. Нажать «Войти»."
+              minlength="10"
+              maxlength="2000"
+              required
+            ></textarea>
+          </label>
+        </div>
+
+        <p
+          class="message"
+          id="create-message"
+          role="status"
+          aria-live="polite"
+          hidden
+        ></p>
+
+        <div class="form-footer">
+          <div class="dialog-actions">
+            <button type="button" class="button button--ghost" id="cancel-create">
+              Отмена
+            </button>
+            <button type="submit" class="button" id="create-button">
+              Добавить тест-кейс
+            </button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="dialog dialog--confirm"
+      id="delete-dialog"
+      aria-labelledby="delete-title"
+      aria-describedby="delete-text"
+    >
+      <div class="dialog-header">
+        <h2 id="delete-title">Удалить тест-кейс?</h2>
+        <button
+          type="button"
+          class="dialog-close"
+          id="close-delete"
+          aria-label="Закрыть окно удаления"
+        >
+          ×
+        </button>
+      </div>
+
+      <p class="dialog-text" id="delete-text">
+        Тест-кейс «<span id="delete-name"></span>» будет удалён без возможности
+        восстановления.
+      </p>
+
+      <p
+        class="message"
+        id="delete-message"
+        role="status"
+        aria-live="polite"
+        hidden
+      ></p>
+
+      <div class="dialog-actions dialog-actions--end">
+        <button type="button" class="button button--ghost" id="cancel-delete">
+          Отмена
+        </button>
+        <button type="button" class="button button--danger" id="confirm-delete">
+          Удалить
+        </button>
+      </div>
+    </dialog>
+
+    <script type="module" src="/js/app.js"></script>
   </body>
 </html>
